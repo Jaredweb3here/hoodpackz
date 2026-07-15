@@ -17,13 +17,13 @@ export const metadata: Metadata = {
   title: "Stockpackz | Robinhood Chain",
   description: "Open packs. Own tokenized stocks on Robinhood Chain.",
   icons: {
-    icon: "/graphics/stockpackz-icon-v4.png",
-    apple: "/graphics/stockpackz-icon-v4.png",
+    icon: "/graphics/stockpackz-icon-v5.png",
+    apple: "/graphics/stockpackz-icon-v5.png",
   },
   openGraph: {
     title: "Stockpackz",
     description: "Open packs. Own tokenized stocks on Robinhood Chain.",
-    images: ["/graphics/stockpackz-logo-v4.png"],
+    images: ["/graphics/stockpackz-logo-v5.png"],
   },
 };
 

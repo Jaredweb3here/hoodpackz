@@ -80,7 +80,7 @@ export function MiniPack({
         />
         <div className="absolute inset-x-[10%] top-[21%] bottom-[15%] flex flex-col items-center justify-center gap-1 rounded-[3px] border border-white/[0.06] bg-gradient-to-b from-[#101010] to-[#080808]">
           <Image
-            src="/graphics/stockpackz-icon-v4.png"
+            src="/graphics/stockpackz-icon-v5.png"
             alt=""
             width={40}
             height={40}
