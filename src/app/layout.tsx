@@ -14,16 +14,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stockpackz | Robinhood Chain",
+  title: "StockPackz | Robinhood Chain",
   description: "Open packs. Own tokenized stocks on Robinhood Chain.",
   icons: {
-    icon: "/graphics/stockpackz-icon-v5.png",
-    apple: "/graphics/stockpackz-icon-v5.png",
+    // Solid dark icons — transparent PNGs render as unpredictable shapes in
+    // tabs, home screens, and pinned sites.
+    icon: "/graphics/stockpackz-touch-icon.png",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "Stockpackz",
+    title: "StockPackz",
     description: "Open packs. Own tokenized stocks on Robinhood Chain.",
-    images: ["/graphics/stockpackz-logo-v5.png"],
+    images: [{ url: "/graphics/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StockPackz",
+    description: "Open packs. Own tokenized stocks on Robinhood Chain.",
+    images: ["/graphics/og-image.png"],
   },
 };
 
