@@ -30,6 +30,8 @@ export const capsuleTypes: CapsuleType[] = [
     rarityPreview: ["rare", "epic", "legendary"],
     // MSFT has no in-range USDG liquidity on-chain yet.
     comingSoon: true,
+    comingSoonReason:
+      "MSFT is tokenized on Robinhood Chain but its Uniswap pool doesn't have enough liquidity to buy yet. This pack opens the moment it does.",
   },
   {
     id: "dividend",
@@ -42,6 +44,8 @@ export const capsuleTypes: CapsuleType[] = [
     rarityPreview: ["common", "rare"],
     // KO/PG/JNJ/PEP not tokenized on Robinhood Chain yet.
     comingSoon: true,
+    comingSoonReason:
+      "Robinhood hasn't tokenized KO, PG, JNJ, or PEP yet. This pack goes live as soon as they hit the chain.",
   },
   {
     id: "healthcare",
@@ -54,6 +58,8 @@ export const capsuleTypes: CapsuleType[] = [
     rarityPreview: ["common", "rare"],
     // Healthcare names not tokenized on Robinhood Chain yet.
     comingSoon: true,
+    comingSoonReason:
+      "Healthcare names like JNJ aren't tokenized on Robinhood Chain yet. This pack goes live as soon as they hit the chain.",
   },
   {
     id: "future-tech",

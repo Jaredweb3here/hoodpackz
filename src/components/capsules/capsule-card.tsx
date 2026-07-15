@@ -72,9 +72,16 @@ export function CapsuleCard({ capsule, index, onSelect }: CapsuleCardProps) {
           >
             <div className="relative flex aspect-[4/4.4] items-center justify-center overflow-hidden">
               {capsule.comingSoon && (
-                <span className="absolute top-5 left-5 z-20 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/70 ring-1 ring-white/[0.12] backdrop-blur-md">
-                  Coming Soon
-                </span>
+                <div className="absolute top-5 left-5 z-20">
+                  <span className="inline-block rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/70 ring-1 ring-white/[0.12] backdrop-blur-md">
+                    Coming Soon
+                  </span>
+                  {capsule.comingSoonReason && (
+                    <div className="pointer-events-none mt-2 w-60 translate-y-1 rounded-2xl bg-black/85 px-4 py-3 text-[12px] leading-relaxed font-normal normal-case tracking-normal text-white/75 opacity-0 shadow-[0_16px_48px_rgba(0,0,0,0.6)] ring-1 ring-white/[0.1] backdrop-blur-xl transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                      {capsule.comingSoonReason}
+                    </div>
+                  )}
+                </div>
               )}
               <div
                 aria-hidden

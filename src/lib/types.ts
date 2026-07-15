@@ -39,6 +39,8 @@ export interface CapsuleType {
   rarityPreview: Rarity[];
   /** Pack exists but can't open yet (stocks not tokenized / no liquidity) */
   comingSoon?: boolean;
+  /** Shown on hover: why the pack can't open yet */
+  comingSoonReason?: string;
 }
 
 export interface Collection {

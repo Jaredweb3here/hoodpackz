@@ -304,6 +304,7 @@ export function OpenCapsuleFlow({
                   capsule.comingSoon ? (
                     <div
                       key={capsule.id}
+                      title={capsule.comingSoonReason}
                       className="flex w-full items-center gap-4 rounded-2xl bg-white/[0.02] px-4 py-3.5 opacity-60"
                     >
                       <MiniPack
