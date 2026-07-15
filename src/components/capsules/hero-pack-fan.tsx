@@ -7,12 +7,12 @@ import { getCapsuleArtwork } from "@/lib/capsule-artwork";
 import { StockLogo } from "./stock-logo";
 
 const CHIPS = [
-  { ticker: "NVDA", x: "6%", y: "12%", delay: 0, dur: 5.5 },
-  { ticker: "AAPL", x: "88%", y: "18%", delay: 0.8, dur: 6.2 },
-  { ticker: "TSLA", x: "2%", y: "62%", delay: 1.6, dur: 5.8 },
-  { ticker: "MSFT", x: "92%", y: "58%", delay: 0.4, dur: 6.6 },
-  { ticker: "AMZN", x: "14%", y: "88%", delay: 1.2, dur: 6.0 },
-  { ticker: "GOOGL", x: "82%", y: "90%", delay: 2.0, dur: 5.6 },
+  { ticker: "NVDA", x: "4%", y: "10%", delay: 0, dur: 5.5, drift: 10, tilt: -3 },
+  { ticker: "AAPL", x: "86%", y: "16%", delay: 0.8, dur: 6.2, drift: -12, tilt: 4 },
+  { ticker: "TSLA", x: "0%", y: "60%", delay: 1.6, dur: 5.8, drift: 8, tilt: 3 },
+  { ticker: "MSFT", x: "90%", y: "56%", delay: 0.4, dur: 6.6, drift: -9, tilt: -4 },
+  { ticker: "AMZN", x: "12%", y: "88%", delay: 1.2, dur: 6.0, drift: 11, tilt: 4 },
+  { ticker: "GOOGL", x: "80%", y: "90%", delay: 2.0, dur: 5.6, drift: -10, tilt: -3 },
 ];
 
 const FAN = [
@@ -59,20 +59,49 @@ export function HeroPackFan() {
       />
 
       {/* Floating stock chips */}
-      {CHIPS.map((chip) => (
+      {CHIPS.map((chip, i) => (
         <motion.div
           key={chip.ticker}
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: chip.dur, repeat: Infinity, ease: "easeInOut", delay: chip.delay }}
+          initial={{ opacity: 0, scale: 0.4, y: 24 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: 0.5 + i * 0.14, type: "spring", stiffness: 260, damping: 18 }}
           className="absolute z-20 hidden sm:block"
           style={{ left: chip.x, top: chip.y }}
         >
-          <div className="flex items-center gap-2 rounded-full bg-white/[0.05] py-1.5 pr-3.5 pl-1.5 ring-1 ring-white/[0.08] backdrop-blur-xl">
-            <StockLogo ticker={chip.ticker} size="xs" />
-            <span className="text-[11px] font-semibold tracking-wide text-white/60">
-              {chip.ticker}
-            </span>
-          </div>
+          <motion.div
+            animate={{
+              y: [0, -16, -4, 0],
+              x: [0, chip.drift, chip.drift * 0.4, 0],
+              rotate: [0, chip.tilt, -chip.tilt * 0.5, 0],
+            }}
+            transition={{
+              duration: chip.dur,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: chip.delay,
+            }}
+            whileHover={{ scale: 1.12 }}
+            className="relative"
+          >
+            {/* Pulsing glow halo */}
+            <motion.div
+              aria-hidden
+              animate={{ opacity: [0.2, 0.55, 0.2], scale: [0.95, 1.12, 0.95] }}
+              transition={{
+                duration: chip.dur * 0.6,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: chip.delay,
+              }}
+              className="absolute -inset-1.5 rounded-full bg-rh-green/12 blur-lg"
+            />
+            <div className="relative flex items-center gap-2.5 rounded-full bg-white/[0.06] py-2 pr-5 pl-2 shadow-[0_10px_36px_rgba(0,0,0,0.5)] ring-1 ring-white/[0.1] backdrop-blur-xl">
+              <StockLogo ticker={chip.ticker} size="sm" />
+              <span className="text-sm font-semibold tracking-wide text-white/75">
+                {chip.ticker}
+              </span>
+            </div>
+          </motion.div>
         </motion.div>
       ))}
 
