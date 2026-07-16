@@ -14,6 +14,15 @@ export const dynamic = "force-dynamic";
  * (roll < 40 / 1,000,000 wins, 90% paid / 10% seed retained).
  */
 export async function POST(request: Request) {
+  // Once real contracts are configured, the demo draw is dead code — refuse
+  // it outright so no stale client can ever show a fake opening.
+  if (process.env.NEXT_PUBLIC_STOCKPACKZ_ADDRESS) {
+    return NextResponse.json(
+      { error: "Demo openings are disabled — pack openings are live on-chain. Refresh the page." },
+      { status: 410 }
+    );
+  }
+
   let body: { packId?: string };
   try {
     body = await request.json();

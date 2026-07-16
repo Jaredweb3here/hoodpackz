@@ -7,7 +7,6 @@ import confetti from "canvas-confetti";
 import { ArrowRight, Check, X } from "lucide-react";
 import { useAccount } from "wagmi";
 import type { CapsuleType, PullResult } from "@/lib/types";
-import { pickRandomPull } from "@/lib/mock-data";
 import { isOnchainPack, openPackOnchain, OpeningError } from "@/lib/onchain";
 import { PACK_ECONOMICS, JACKPOT_ODDS, BURN_ECONOMICS, PACK_XP, type SettlementResult } from "@/lib/protocol";
 import { formatCurrency } from "@/lib/utils";
@@ -135,25 +134,13 @@ export function OpenCapsuleFlow({
               body: JSON.stringify({ packId: capsule.id }),
             })
               .then(async (res) => {
-                if (!res.ok) throw new Error("open failed");
-                return (await res.json()) as SettlementResult;
-              })
-              .catch(() => {
-                // Offline/demo fallback: draw locally with the same weights.
-                const pull = pickRandomPull(capsule);
-                return {
-                  packId: capsule.id,
-                  stock: pull.stock,
-                  tokenAmount: pull.tokenAmount,
-                  valueUsd: pull.valueUsd,
-                  usdgIn: PACK_ECONOMICS.stockAmount,
-                  executionPrice: pull.tokenAmount > 0 ? pull.valueUsd / pull.tokenAmount : 0,
-                  jackpotContribution: PACK_ECONOMICS.jackpotContribution,
-                  jackpotWon: false,
-                  jackpotPayout: 0,
-                  txHash: "",
-                  settledAt: new Date().toISOString(),
-                } satisfies SettlementResult;
+                const data = (await res.json().catch(() => null)) as
+                  | (SettlementResult & { error?: string })
+                  | null;
+                if (!res.ok || !data) {
+                  throw new Error(data?.error ?? "Opening failed — you were not charged.");
+                }
+                return data;
               });
 
       const at = (ms: number, fn: () => void) => {
