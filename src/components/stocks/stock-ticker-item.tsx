@@ -1,21 +1,17 @@
 "use client";
 
-import { TrendingDown, TrendingUp } from "lucide-react";
 import { StockLogo } from "@/components/capsules/stock-logo";
-import { StockSparkline } from "./stock-sparkline";
-import { getMockQuote } from "@/lib/stock-market-mock";
 import type { TokenizedStock } from "@/lib/tokenized-stocks";
 import { formatCurrency, cn } from "@/lib/utils";
 
 interface StockTickerItemProps {
   stock: TokenizedStock;
+  /** Live on-chain pool price; undefined/null renders a live-dot only. */
+  price?: number | null;
   className?: string;
 }
 
-export function StockTickerItem({ stock, className }: StockTickerItemProps) {
-  const quote = getMockQuote(stock);
-  const positive = quote.changePercent >= 0;
-
+export function StockTickerItem({ stock, price, className }: StockTickerItemProps) {
   return (
     <div
       className={cn(
@@ -25,18 +21,14 @@ export function StockTickerItem({ stock, className }: StockTickerItemProps) {
     >
       <StockLogo ticker={stock.ticker} logoUrl={stock.logoUrl} color={stock.brandColor} size="xs" />
       <span className="text-sm font-semibold text-white">{stock.ticker}</span>
-      <span className="text-sm tabular-nums text-white/55">{formatCurrency(quote.price)}</span>
-      <StockSparkline data={quote.sparkline} positive={positive} width={52} height={20} />
-      <span
-        className={cn(
-          "flex items-center gap-0.5 text-xs font-semibold tabular-nums",
-          positive ? "text-emerald-400" : "text-red-400"
-        )}
-      >
-        {positive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-        {positive ? "+" : ""}
-        {quote.changePercent.toFixed(2)}%
-      </span>
+      {price != null ? (
+        <span className="text-sm tabular-nums text-white/55">{formatCurrency(price)}</span>
+      ) : (
+        <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-white/35">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#00c805]" />
+          on-chain
+        </span>
+      )}
     </div>
   );
 }

@@ -135,7 +135,7 @@ export const rarityTiers: RarityTier[] = [
     stars: 5,
     stocks: [
       { name: "SpaceX", ticker: "SPCX" },
-      { name: "OpenAI", ticker: "OPEN" },
+      { name: "NVIDIA", ticker: "NVDA" },
     ],
   },
   {
@@ -143,8 +143,8 @@ export const rarityTiers: RarityTier[] = [
     label: "Epic",
     stars: 4,
     stocks: [
-      { name: "NVIDIA", ticker: "NVDA" },
-      { name: "Broadcom", ticker: "AVGO" },
+      { name: "AMD", ticker: "AMD" },
+      { name: "Tesla", ticker: "TSLA" },
     ],
   },
   {
@@ -153,7 +153,7 @@ export const rarityTiers: RarityTier[] = [
     stars: 3,
     stocks: [
       { name: "Apple", ticker: "AAPL" },
-      { name: "Microsoft", ticker: "MSFT" },
+      { name: "Alphabet", ticker: "GOOGL" },
     ],
   },
   {
@@ -161,8 +161,8 @@ export const rarityTiers: RarityTier[] = [
     label: "Common",
     stars: 2,
     stocks: [
-      { name: "Disney", ticker: "DIS" },
-      { name: "Ford", ticker: "F" },
+      { name: "Micron", ticker: "MU" },
+      { name: "Amazon", ticker: "AMZN" },
     ],
   },
 ];

@@ -8,7 +8,7 @@ import { ArrowRight, Check, X } from "lucide-react";
 import { useAccount } from "wagmi";
 import type { CapsuleType, PullResult } from "@/lib/types";
 import { isOnchainPack, openPackOnchain, OpeningError } from "@/lib/onchain";
-import { PACK_ECONOMICS, JACKPOT_ODDS, BURN_ECONOMICS, PACK_XP, type SettlementResult } from "@/lib/protocol";
+import { JACKPOT_ODDS, type SettlementResult } from "@/lib/protocol";
 import { formatCurrency } from "@/lib/utils";
 import { StockLogo } from "./stock-logo";
 import { ConnectWalletPrompt } from "./connect-wallet-prompt";
@@ -363,15 +363,11 @@ export function OpenCapsuleFlow({
                 </p>
               )}
               <p className="mt-3 text-center text-[11px] leading-relaxed text-white/30">
-                Every {formatCurrency(PACK_ECONOMICS.price)} pack: {formatCurrency(PACK_ECONOMICS.stockAmount)} buys
-                your stock · {formatCurrency(PACK_ECONOMICS.protocolFee)} protocol ·{" "}
-                {formatCurrency(PACK_ECONOMICS.jackpotContribution)} jackpot · 1 in{" "}
+                90% of every pack buys your stock · 6% protocol · 4% jackpot · 1 in{" "}
                 {JACKPOT_ODDS.approxOneIn.toLocaleString()} wins the vault
               </p>
               <p className="mt-1.5 text-center text-[11px] leading-relaxed text-white/30">
-                Holders add a ~{formatCurrency(BURN_ECONOMICS.burnUsd)} STOCKPACKZ burn · non-holders
-                pay {formatCurrency(BURN_ECONOMICS.nonHolderTotal)} with no burn · +{PACK_XP.standard} XP
-                per opening
+                Pay with USDG — or ETH/WETH, converted automatically at the best v4 rate
               </p>
               <div className="mt-6 space-y-2">
                 {capsules.map((capsule) =>
@@ -702,7 +698,7 @@ export function OpenCapsuleFlow({
                       {result.stock.name}
                     </h3>
                     <p className="mt-3 text-4xl font-bold tabular-nums tracking-tight text-white">
-                      {result.tokenAmount}{" "}
+                      {result.tokenAmount.toLocaleString("en-US", { maximumSignificantDigits: 5 })}{" "}
                       <span className="text-white/50">{result.stock.ticker}</span>
                     </p>
                     <p className="mt-2 text-lg tabular-nums text-white/40">
@@ -737,7 +733,6 @@ export function OpenCapsuleFlow({
                           `${formatCurrency(settlement.executionPrice)} / ${settlement.stock.ticker}`,
                         ],
                         ["Jackpot contribution", formatCurrency(settlement.jackpotContribution)],
-                        ["XP earned", `+${PACK_XP.standard} XP`],
                       ].map(([label, value]) => (
                         <div key={label} className="flex items-center justify-between">
                           <span className="text-white/35">{label}</span>
@@ -747,9 +742,14 @@ export function OpenCapsuleFlow({
                       {settlement.txHash && (
                         <div className="flex items-center justify-between">
                           <span className="text-white/35">Transaction</span>
-                          <span className="font-mono text-white/60">
+                          <a
+                            href={`https://robinhoodchain.blockscout.com/tx/${settlement.txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-mono text-white/60 underline decoration-white/20 underline-offset-2 transition-colors hover:text-white"
+                          >
                             {settlement.txHash.slice(0, 8)}…{settlement.txHash.slice(-6)}
-                          </span>
+                          </a>
                         </div>
                       )}
                     </div>
