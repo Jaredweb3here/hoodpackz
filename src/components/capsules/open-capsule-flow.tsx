@@ -20,6 +20,7 @@ type FlowPhase =
   | "idle"
   | "connect"
   | "selecting"
+  | "confirming"
   | "focus"
   | "rotating"
   | "tearing"
@@ -124,86 +125,101 @@ export function OpenCapsuleFlow({
       setSettlement(null);
       setOpenError(null);
 
-      // The draw authority, in order of preference:
-      //  1. Real on-chain opening (USDG in, stock delivered to the wallet)
-      //  2. Server-side draw (demo mode when contracts aren't configured)
-      // The reveal is gated on it — no company is ever shown before the
-      // draw resolves.
-      const liveAddress = addressRef.current;
-      const draw: Promise<SettlementResult> = isOnchainPack(capsule.id)
-        ? liveAddress
-          ? openPackOnchain(capsule, liveAddress)
-          : Promise.reject(
-              new OpeningError("Wallet not detected — reconnect your wallet and try again.")
-            )
-        : fetch("/api/packs/open", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ packId: capsule.id }),
-            })
-              .then(async (res) => {
-                const data = (await res.json().catch(() => null)) as
-                  | (SettlementResult & { error?: string })
-                  | null;
-                if (!res.ok || !data) {
-                  throw new Error(data?.error ?? "Opening failed — you were not charged.");
-                }
-                return data;
-              });
-
       const at = (ms: number, fn: () => void) => {
         timersRef.current.push(setTimeout(fn, ms));
       };
 
-      setPhase("focus");
-      at(850, () => {
-        setPhase("rotating");
-        crinkleRef.current = setInterval(() => playCrinkle(0.4 + Math.random() * 0.4), 420);
-      });
-      at(3050, () => {
-        if (crinkleRef.current) clearInterval(crinkleRef.current);
-        playCrinkle(1);
-        setPhase("tearing");
-      });
-      // The pack stays sealed until the draw settles — then burst → reveal.
-      at(4250, () => {
-        draw
-          .then((data) => {
-            const pullResult: PullResult = {
-              stock: data.stock,
-              capsule,
-              tokenAmount: data.tokenAmount,
-              valueUsd: data.valueUsd,
-            };
-            setResult(pullResult);
-            setSettlement(data);
-            setPhase("burst");
-            at(1500, () => setPhase("reveal"));
-            at(3850, () => setPhase("swap"));
-            at(4950, () => {
-              setPhase("result");
-              if (data.jackpotWon || pullResult.stock.rarity === "legendary") {
-                fireLegendaryConfetti();
-              }
-              onPullComplete?.(pullResult);
-            });
-          })
-          .catch((err: unknown) => {
-            // On-chain failure: never fake a result. Surface the state and
-            // let the user retry / refund — funds stay safe in the contract.
-            const raw = err instanceof Error ? err.message : "";
-            const message =
-              err instanceof OpeningError
-                ? err.message
-                : raw.includes("User rejected") || raw.includes("user rejected")
-                  ? "Transaction cancelled in wallet."
-                  : raw
-                    ? `Opening failed before any funds moved: ${raw.split("\n")[0].slice(0, 200)}`
-                    : "Opening failed before any funds moved. Please try again.";
-            setOpenError(message);
-            setPhase("selecting");
-          });
-      });
+      /** Sealed pack loop while settlement finishes (focus → rotate → tear). */
+      const startSealedAnimation = () => {
+        setPhase("focus");
+        at(850, () => {
+          setPhase("rotating");
+          crinkleRef.current = setInterval(() => playCrinkle(0.4 + Math.random() * 0.4), 420);
+        });
+        at(3050, () => {
+          if (crinkleRef.current) clearInterval(crinkleRef.current);
+          playCrinkle(1);
+          setPhase("tearing");
+        });
+      };
+
+      /** Reveal sequence once the stock is known. */
+      const revealResult = (data: SettlementResult) => {
+        if (crinkleRef.current) {
+          clearInterval(crinkleRef.current);
+          crinkleRef.current = null;
+        }
+        const pullResult: PullResult = {
+          stock: data.stock,
+          capsule,
+          tokenAmount: data.tokenAmount,
+          valueUsd: data.valueUsd,
+        };
+        setResult(pullResult);
+        setSettlement(data);
+        setPhase("burst");
+        at(1500, () => setPhase("reveal"));
+        at(3850, () => setPhase("swap"));
+        at(4950, () => {
+          setPhase("result");
+          if (data.jackpotWon || pullResult.stock.rarity === "legendary") {
+            fireLegendaryConfetti();
+          }
+          onPullComplete?.(pullResult);
+        });
+      };
+
+      const failOpen = (err: unknown) => {
+        if (crinkleRef.current) {
+          clearInterval(crinkleRef.current);
+          crinkleRef.current = null;
+        }
+        const raw = err instanceof Error ? err.message : "";
+        const message =
+          err instanceof OpeningError
+            ? err.message
+            : raw.includes("User rejected") || raw.includes("user rejected")
+              ? "Transaction cancelled in wallet."
+              : raw
+                ? `Opening failed before any funds moved: ${raw.split("\n")[0].slice(0, 200)}`
+                : "Opening failed before any funds moved. Please try again.";
+        setOpenError(message);
+        setPhase("selecting");
+      };
+
+      // On-chain: wallet confirm → sealed animation → reveal when settled.
+      if (isOnchainPack(capsule.id)) {
+        const liveAddress = addressRef.current;
+        if (!liveAddress) {
+          failOpen(new OpeningError("Wallet not detected — reconnect your wallet and try again."));
+          return;
+        }
+        setPhase("confirming");
+        void openPackOnchain(capsule, liveAddress, {
+          onPaymentConfirmed: startSealedAnimation,
+        })
+          .then(revealResult)
+          .catch(failOpen);
+        return;
+      }
+
+      startSealedAnimation();
+      void fetch("/api/packs/open", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ packId: capsule.id }),
+      })
+        .then(async (res) => {
+          const data = (await res.json().catch(() => null)) as
+            | (SettlementResult & { error?: string })
+            | null;
+          if (!res.ok || !data) {
+            throw new Error(data?.error ?? "Opening failed — you were not charged.");
+          }
+          return data;
+        })
+        .then(revealResult)
+        .catch(failOpen);
     },
     [clearTimers, onPullComplete]
   );
@@ -246,7 +262,8 @@ export function OpenCapsuleFlow({
   if (!isOpen) return null;
 
   const cinematic = CINEMATIC_PHASES.includes(phase);
-  const canDismiss = phase === "result" || phase === "selecting" || phase === "connect";
+  const canDismiss =
+    phase === "result" || phase === "selecting" || phase === "connect" || phase === "confirming";
   const stocks = activeCapsule?.stocks ?? [];
   const winner = result?.stock ?? null;
 
@@ -295,6 +312,36 @@ export function OpenCapsuleFlow({
           )}
 
           {phase === "connect" && <ConnectWalletPrompt onClose={handleClose} />}
+
+          {phase === "confirming" && activeCapsule && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="flex max-w-sm flex-col items-center rounded-3xl bg-white/[0.04] px-8 py-10 text-center backdrop-blur-2xl"
+            >
+              <MiniPack
+                size="md"
+                accent={activeCapsule.artwork.accent}
+                artSrc={getCapsuleArtwork(activeCapsule.id)}
+              />
+              <h3 className="mt-6 text-xl font-semibold tracking-tight text-white">
+                Confirm in your wallet
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/45">
+                Check your wallet — approve USDG (or WETH if needed), then confirm the{" "}
+                {formatCurrency(activeCapsule.price)} purchase. The pack animation starts the
+                moment payment confirms.
+              </p>
+              <span className="relative mt-6 flex h-2.5 w-2.5">
+                <span className="absolute h-full w-full animate-ping rounded-full bg-rh-green opacity-50" />
+                <span className="relative h-2.5 w-2.5 rounded-full bg-rh-green" />
+              </span>
+              <p className="mt-3 text-[11px] uppercase tracking-[0.2em] text-white/30">
+                Waiting for signature
+              </p>
+            </motion.div>
+          )}
 
           {phase === "selecting" && (
             <motion.div

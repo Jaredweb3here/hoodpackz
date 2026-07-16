@@ -269,13 +269,19 @@ async function acquireUsdgWithWeth(account: `0x${string}`, shortfall: bigint): P
   await waitForTransactionReceipt(wagmiConfig, { hash: swapHash });
 }
 
+export type OpenPackHooks = {
+  /** Fired after openPack is mined — safe to start the sealed-pack animation. */
+  onPaymentConfirmed?: () => void;
+};
+
 /**
  * Full on-chain opening: approve USDG if needed, open the pack, nudge the
  * keeper, and poll until the opening settles into the user's wallet.
  */
 export async function openPackOnchain(
   capsule: CapsuleType,
-  account: `0x${string}`
+  account: `0x${string}`,
+  hooks?: OpenPackHooks
 ): Promise<SettlementResult> {
   const core = STOCKPACKZ_ADDRESS;
   if (!core) throw new OpeningError("Contracts not configured");
@@ -329,6 +335,9 @@ export async function openPackOnchain(
   });
   const openingId = logs[0]?.args.openingId;
   if (openingId === undefined) throw new OpeningError("Opening id not found in receipt");
+
+  // Payment is done — UI can start the pack animation while we settle.
+  hooks?.onPaymentConfirmed?.();
 
   // 3. Nudge the keeper to fulfill randomness immediately.
   void fetch("/api/keeper", { method: "POST" }).catch(() => {});
