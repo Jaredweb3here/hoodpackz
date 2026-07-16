@@ -17,7 +17,11 @@ On-chain packs: `1` = AI Pack (NVDA/AMD/INTC/MU), `2` = Future Tech (NVDA/AMD/SP
 Frontend env (Vercel production): `NEXT_PUBLIC_STOCKPACKZ_ADDRESS`,
 `NEXT_PUBLIC_COORDINATOR_ADDRESS`, `KEEPER_PK` (server-only, fulfills randomness).
 
-Jackpot seeding (when ready): `usdg.approve(core, 500e6)` then `core.fundJackpot(500e6)`.
+Jackpot seeding (when ready): `usdg.approve(core, 500e6)` then `core.fundJackpot(500e6)`,
+or run `contracts/script/fund-jackpot.sh <amount-usd> <key>`.
+
+Rewards wallet (Flap creator fees → jackpot top-ups, publicly auditable):
+[`0x6ee19E45EB7e72eb78225C930695cCf689ad065e`](https://robinhoodchain.blockscout.com/address/0x6ee19E45EB7e72eb78225C930695cCf689ad065e)
 
 ## 1. Frontend → Vercel + Namecheap DNS
 

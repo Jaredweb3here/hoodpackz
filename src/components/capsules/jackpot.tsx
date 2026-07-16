@@ -60,7 +60,27 @@ export function Jackpot() {
             vault.
           </p>
           <p className="mt-2 text-sm text-white/25">
-            Seeded at $500. Every pack opened makes it grow.
+            Every pack opened makes it grow — plus 100% of creator rewards.
+          </p>
+          <p className="mt-1 text-xs text-white/20">
+            Verify every top-up on-chain:{" "}
+            <a
+              href="https://robinhoodchain.blockscout.com/address/0x6ee19E45EB7e72eb78225C930695cCf689ad065e"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline decoration-white/15 underline-offset-2 transition-colors hover:text-white/40"
+            >
+              rewards wallet
+            </a>{" "}
+            →{" "}
+            <a
+              href="https://robinhoodchain.blockscout.com/address/0xeee1458ad6deb8fa35f39fddbb1aaa12d4a422f3"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline decoration-white/15 underline-offset-2 transition-colors hover:text-white/40"
+            >
+              jackpot vault
+            </a>
           </p>
         </BlurFade>
 
