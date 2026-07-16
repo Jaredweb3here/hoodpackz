@@ -1,38 +1,38 @@
 # Backend Integration
 
-This document describes how to connect Stockpackz from the current **mock frontend** to a **production system** on Robinhood Chain.
+StockPackz is **live on Robinhood Chain mainnet** (chain ID 4663). This document describes what is wired today and what remains for later phases.
 
 ## Current State
 
 | Feature | Status |
 |---------|--------|
-| Token catalog with real contracts | ✅ Static data |
+| Token catalog with real contracts | ✅ Live (`src/lib/tokenized-stocks.ts`) |
 | Stock logos (FMP CDN) | ✅ Live |
-| Wallet connection (wagmi, chain 4663) | ✅ Implemented (`src/lib/chain.ts`, `wallet-button.tsx`) |
-| Pack opening UI (cinematic) | ✅ Mock random pull |
-| On-chain settlement | ❌ Not implemented |
-| Live Chainlink prices | ❌ Static mock prices |
-| User portfolio persistence | ❌ Mock owned arrays |
-| Live Openings feed / Jackpot counter | ❌ Simulated intervals |
+| Wallet connection (wagmi, chain 4663) | ✅ Live (`src/lib/chain.ts`, `wallet-button.tsx`) |
+| Pack opening UI (cinematic) | ✅ Live — wallet payment first, then reveal |
+| On-chain settlement | ✅ Live — `StockPackz.openPack` + Uniswap v4 + keeper randomness |
+| Live prices | ✅ Live — Uniswap v4 pool prices via `/api/stocks` |
+| Live Openings feed | ✅ Live — indexed from `StockPurchased` / `JackpotWon` events |
+| Jackpot counter | ✅ Live — `$300` base pot + on-chain vault via `/api/jackpot` |
+| Pay with USDG or ETH/WETH | ✅ Live — auto WETH→USDG via the protocol adapter |
+| User portfolio / collections persistence | ⏳ Pending — collections UI still local; holdings are on-chain ERC-20s |
+| PACKZ holder burn / XP / tiers | ⏳ Pending — token is live on Flap; utility modules not wired yet |
 
-## Integration Architecture
+## Live Architecture
 
 ```
-┌─────────────┐     ┌──────────────┐     ┌─────────────────────┐
-│  Next.js    │────▶│  API Routes  │────▶│  Robinhood Chain    │
-│  Frontend   │     │  / Backend   │     │  (chain ID 4663)    │
-└─────────────┘     └──────────────┘     └─────────────────────┘
-       │                    │                      │
-       │                    │                      ├── Capsule Contract
-       │                    │                      ├── Stock Token ERC-20s
-       │                    │                      └── Chainlink Feeds
-       │                    │
-       │                    ▼
-       │             ┌──────────────┐
-       └────────────▶│  Database    │
-                     │  (Postgres)  │
-                     └──────────────┘
+┌─────────────┐     ┌──────────────────┐     ┌─────────────────────────────┐
+│  Next.js    │────▶│  API Routes      │────▶│  Robinhood Chain (4663)     │
+│  Frontend   │     │  /api/activity   │     │                             │
+│  wagmi/viem │     │  /api/jackpot    │     │  StockPackz core            │
+└──────┬──────┘     │  /api/stocks     │     │  UniswapV4NativeAdapter     │
+       │            │  /api/keeper     │     │  KeeperRandomnessCoordinator│
+       │            └──────────────────┘     │  Tokenized stock ERC-20s    │
+       │                                     │  Uniswap v4 pools (prices)  │
+       └────────────────────────────────────▶└─────────────────────────────┘
 ```
+
+Deployed addresses: see [DEPLOYMENT.md](../DEPLOYMENT.md).
 
 ## Step 1: Wallet Connection
 

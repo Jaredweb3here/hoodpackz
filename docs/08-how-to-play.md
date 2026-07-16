@@ -74,17 +74,18 @@ Tip: every pack card is expandable — tap the chevron to see each possible comp
 
 ---
 
-## Preview vs production
+## Live status
 
-| Feature | Preview (now) | Production |
-|---------|---------------|------------|
-| Wallet connect | ✅ Real | ✅ Real |
-| Network switch | ✅ Real | ✅ Real |
-| Pack open | Simulated random pull | Smart contract + payment |
-| Token transfer | Mock (UI only) | Real ERC-20 transfer |
-| Price data | Static mock | Chainlink feeds |
+| Feature | Status |
+|---------|--------|
+| Wallet connect | ✅ Real |
+| Network switch | ✅ Robinhood Chain (4663) |
+| Pack open | ✅ On-chain — USDG/ETH payment → keeper randomness → Uniswap v4 stock delivery |
+| Token transfer | ✅ Real ERC-20 stock tokens to your wallet |
+| Price data | ✅ Live Uniswap v4 pool prices |
+| Live openings / jackpot | ✅ Real on-chain data |
 
-The preview lets you experience the full UI flow after connecting. Production requires the Pack smart contract — see [Backend Integration](./07-backend-integration.md).
+See [Backend Integration](./07-backend-integration.md) and [DEPLOYMENT.md](../DEPLOYMENT.md) for addresses.
 
 ---
 

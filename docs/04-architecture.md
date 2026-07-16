@@ -89,10 +89,10 @@ React local state only — no global store in the preview build.
 |-------|----------|---------|
 | `flowOpen` | `page.tsx` | Controls opening modal visibility |
 | `selectedCapsule` | `page.tsx` | Pre-selected pack from card click |
-| `phase` | `open-capsule-flow.tsx` | `focus → rotating → tearing → burst → reveal → swap → result` |
-| `result` | `open-capsule-flow.tsx` | Pull outcome, drawn before the animation starts |
-| `events` | `live-openings.tsx` | Simulated live feed (interval) |
-| `value` | `jackpot.tsx` | Growing jackpot counter (interval) |
+| `phase` | `open-capsule-flow.tsx` | `confirming → focus → rotating → tearing → burst → reveal → swap → result` |
+| `result` | `open-capsule-flow.tsx` | Pull outcome from on-chain settlement |
+| `events` | `live-openings.tsx` | Polled from `/api/activity` (on-chain event logs) |
+| `value` | `jackpot.tsx` | `$300` base + live vault from `/api/jackpot` |
 | `expanded` | `capsule-card.tsx` | Pack explorer panel toggle |
 
 ## Component Dependencies
