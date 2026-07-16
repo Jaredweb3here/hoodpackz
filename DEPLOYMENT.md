@@ -2,6 +2,23 @@
 
 Launch-day runbook: frontend on a custom domain, then the PACKZ token on Uniswap v4 — **without seeding liquidity**.
 
+## Live deployment — Robinhood Chain mainnet (4663)
+
+Deployed and verified July 16, 2026:
+
+| Contract | Address |
+| --- | --- |
+| StockPackz core | [`0xeee1458ad6deb8fa35f39fddbb1aaa12d4a422f3`](https://robinhoodchain.blockscout.com/address/0xeee1458ad6deb8fa35f39fddbb1aaa12d4a422f3) |
+| UniswapV4NativeAdapter | [`0x0b17df805a8c0921cb1b141f4515612028d8e4a7`](https://robinhoodchain.blockscout.com/address/0x0b17df805a8c0921cb1b141f4515612028d8e4a7) |
+| KeeperRandomnessCoordinator | [`0x28a6a8eea385febb9f0d88f6c6064cbe972f9cd7`](https://robinhoodchain.blockscout.com/address/0x28a6a8eea385febb9f0d88f6c6064cbe972f9cd7) |
+
+On-chain packs: `1` = AI Pack (NVDA/AMD/INTC/MU), `2` = Future Tech (NVDA/AMD/SPCX/MU).
+
+Frontend env (Vercel production): `NEXT_PUBLIC_STOCKPACKZ_ADDRESS`,
+`NEXT_PUBLIC_COORDINATOR_ADDRESS`, `KEEPER_PK` (server-only, fulfills randomness).
+
+Jackpot seeding (when ready): `usdg.approve(core, 500e6)` then `core.fundJackpot(500e6)`.
+
 ## 1. Frontend → Vercel + Namecheap DNS
 
 Deploy (from the repo root):
