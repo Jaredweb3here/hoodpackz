@@ -2,6 +2,5 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "outputDirectory": ".next",
-  "nodeVersion": "22.x"
+  "outputDirectory": ".next"
 }
