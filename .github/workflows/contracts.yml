@@ -19,14 +19,22 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: v1.7.1
 
       - name: Install dependencies
         run: |
-          forge install foundry-rs/forge-std --no-git
-          forge install OpenZeppelin/openzeppelin-contracts --no-git
+          forge install foundry-rs/forge-std@bf647bd6046f2f7da30d0c2bf435e5c76a780c1b --no-git
+          forge install OpenZeppelin/openzeppelin-contracts@5fd1781b1454fd1ef8e722282f86f9293cacf256 --no-git
 
       - name: Check formatting
-        run: forge fmt --check src test || true
+        run: >-
+          forge fmt --check
+          src/interfaces/IThresholdSignatureVerifier.sol
+          src/randomness/BeaconOperatorRegistry.sol
+          src/randomness/OperatorBondVault.sol
+          src/randomness/ThresholdRandomBeacon.sol
+          test/v2/ThresholdRandomBeacon.t.sol
 
       - name: Build
         run: forge build --sizes
