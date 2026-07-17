@@ -1993,3 +1993,85 @@ body {
     grid-template-columns: 1fr auto;
   }
 }
+
+/* ─── Transparency / contracts section ─── */
+.hp-transparency {
+  padding: 88px clamp(28px, 6vw, 96px);
+  background: #0e1010;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hp-contract-grid {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hp-contract-row {
+  display: grid;
+  grid-template-columns: 220px 1fr auto auto;
+  align-items: center;
+  gap: 16px 28px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.hp-contract-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.hp-contract-label {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--hp-paper);
+  text-transform: uppercase;
+}
+
+.hp-contract-addr {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  color: rgba(243, 241, 232, 0.45);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hp-contract-note {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  color: rgba(243, 241, 232, 0.3);
+  white-space: nowrap;
+}
+
+.hp-contract-cta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--hp-yellow);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .hp-contract-row {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+  }
+
+  .hp-contract-addr {
+    grid-column: 1 / -1;
+    font-size: 10px;
+  }
+
+  .hp-contract-note {
+    display: none;
+  }
+}

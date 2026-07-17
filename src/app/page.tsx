@@ -320,7 +320,7 @@ export default function HoodPackzPage() {
           <a href="#assets">TOKENS</a>
           <a href="#proof">PROOF</a>
           <a href="#economics">ECONOMICS</a>
-          <a href="#contracts">CONTRACTS</a>
+          <a href="#transparency">CONTRACTS</a>
         </nav>
         <HoodWalletButton />
       </header>
@@ -672,6 +672,40 @@ export default function HoodPackzPage() {
           <article><span>02</span><ShieldCheck /><h3>SIGN</h3><p>Four independent operators produce threshold BLS shares against bonded collateral.</p></article>
           <article><span>03</span><Dices /><h3>FINALIZE</h3><p>One unique aggregate signature becomes immutable randomness for the pull.</p></article>
           <article><span>04</span><Zap /><h3>DELIVER</h3><p>Randomness finalizes independently, even if delivery needs to be retried.</p></article>
+        </div>
+      </section>
+
+      <section id="transparency" className="hp-transparency" aria-labelledby="transparency-heading">
+        <div className="hp-proof-head">
+          <div>
+            <span className="hp-section-label">FULLY ONCHAIN / ROBINHOOD CHAIN 4663</span>
+            <h2 id="transparency-heading">EVERY CONTRACT.<br />EVERY ADDRESS.</h2>
+          </div>
+          <a href="https://github.com/Jaredweb3here/hoodpackz" target="_blank" rel="noreferrer">
+            VIEW SOURCE <ArrowUpRight size={16} />
+          </a>
+        </div>
+        <div className="hp-contract-grid">
+          {([
+            { label: "HoodPackzCore V2", addr: "0x5337Ad84857E433b7d57Ca1130079044Ef37e436", note: "Pack sales, inventory, prize delivery" },
+            { label: "ThresholdRandomBeacon", addr: "0x2B4547eAf629dE637C28146C3104e83f1F0AE7dc", note: "4-of-7 BLS randomness finalization" },
+            { label: "BLS12381Verifier", addr: "0xf500CBd6bE6CCa621a0Bca39e384729E51ECF1c8", note: "EIP-2537 aggregate signature verification" },
+            { label: "BeaconOperatorRegistry", addr: "0xFbE3C11728676604f90ea637450B6FEd24af3bb0", note: "Operator registration and epoch keys" },
+            { label: "OperatorBondVault", addr: "0x70AFe9e397E0daF274368C6DEbd485F01B7c7E8D", note: "Slashable operator collateral" },
+          ] as const).map(({ label, addr, note }) => (
+            <a
+              key={addr}
+              className="hp-contract-row"
+              href={`https://robinhoodchain.blockscout.com/address/${addr}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span className="hp-contract-label">{label}</span>
+              <code className="hp-contract-addr">{addr}</code>
+              <span className="hp-contract-note">{note}</span>
+              <span className="hp-contract-cta">BLOCKSCOUT <ExternalLink size={11} /></span>
+            </a>
+          ))}
         </div>
       </section>
 
