@@ -94,9 +94,12 @@ export function OpenCapsuleFlow({
   // The opening callback must always see the live wallet address — a stale
   // closure here silently routed real users onto the demo path.
   const addressRef = useRef(address);
-  addressRef.current = address;
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const crinkleRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    addressRef.current = address;
+  }, [address]);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);

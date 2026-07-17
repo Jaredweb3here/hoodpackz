@@ -1,44 +1,55 @@
-# Audit Scope
+# HoodPackz V2 Audit Scope
 
-This document defines the surface, invariants, and priorities for a security review of the StockPackz protocol. Status: **pre-audit** — no engagement has been completed yet.
+Status: **pre-audit and not deployed**.
 
-## In-scope contracts
+## Current in-scope contracts
 
-| Contract | LoC focus | Priority |
+| Contract | Primary review areas | Priority |
 | --- | --- | --- |
-| `contracts/src/StockPackz.sol` | Opening state machine, jackpot ordering, liability accounting, burn/surcharge, gates | Critical |
-| `contracts/src/adapters/UniswapV4Adapter.sol` | Swap execution, allowlists, deadline/slippage enforcement | Critical |
-| `contracts/src/vaults/PackRewardsVault.sol` | Pull-or-fallback funding semantics | High |
-| `contracts/src/vaults/TaxVaultConverter.sol` | Keeper conversion bounds | High |
-| `contracts/src/credits/PackCredits.sol` | Backing vs. liability accounting, epoch claims | High |
-| `contracts/src/membership/MembershipTierManager.sol` | Tier resolution | Medium |
-| `contracts/src/progression/XPManager.sol` | Award gating, curve math | Medium |
-| `contracts/src/progression/LevelUnlockRegistry.sol` | Registry access | Low |
-| `contracts/src/badges/CollectionBadges.sol` | Claim verification, soulbound enforcement | Medium |
-| `contracts/src/token/StockPackzToken.sol` | Tax split correctness, exemptions | Medium |
-| `contracts/src/adapters/OracleTokenPriceAdapter.sol` | Staleness/bounds checks | High |
+| `ThresholdRandomBeacon` | Round state machine, exposure, finalization, rescue, delivery | Critical |
+| `BeaconOperatorRegistry` | Epoch immutability, key-set validation, verifier binding | Critical |
+| `OperatorBondVault` | Available collateral, locks, withdrawals, slashing | Critical |
+| `IThresholdSignatureVerifier` | Cryptographic trust boundary | Critical |
 
-Mocks (`contracts/src/mocks/*`) are out of scope except as test infrastructure.
+The production EIP-2537 verifier is not implemented and must be added to scope before deployment.
 
-## Core invariants to verify
+## Randomness invariants
 
-1. A paid opening always terminates in exactly one of: `Settled`, `Refunded`, `CancelledAndRefunded` — and the user receives stock or their full payment, never neither.
-2. `usdg.balanceOf(core) ≥ pendingLiabilities + jackpotBalance` at all times.
-3. No admin path can reduce `pendingLiabilities` or `jackpotBalance` except through settlement, refunds, or jackpot payouts.
-4. Treasury and jackpot legs are finalized if and only if the stock swap settled.
-5. Stock selection uses only the per-opening snapshot; no post-payment configuration read affects a pending opening.
-6. The jackpot pays exactly `floor(balance × 0.9)` and retains the remainder, with the contribution added before the balance read.
-7. XP for an opening is awarded at most once, and only on the `Settled` transition.
-8. Discounts never reduce the stock or jackpot legs; subsidies are always backed by an actual USDG transfer from the Rewards Vault.
-9. The burn path never executes with a stale or out-of-bounds oracle price.
-10. Weighted selection is uniform over the configured weights (denominator 10,000) for all random words.
+1. No request can create economic exposure without sufficient locked slashable collateral.
+2. Capacity equals at most the sum of the four smallest available bonds in the active seven-operator epoch.
+3. Pending withdrawals are excluded from available collateral and remain slash-consistent.
+4. A round finalizes once, from a valid signature under its snapshotted epoch keys.
+5. Rescue shares are attributable and cannot be replayed across rounds, epochs, chains, or consumers.
+6. Deadlines begin at round sealing and cannot be shortened retroactively.
+7. Callback failure cannot alter or erase finalized randomness.
+8. Legacy and zero-exposure request paths fail closed.
+9. Registry and beacon use the same immutable verifier.
+10. Malformed, non-canonical, infinity, and invalid-subgroup points are rejected.
 
-## Known areas of nuance
+## Planned scope expansion
 
-- `executeSettlement` is an external self-call to enable try/catch; auditors should verify the `msg.sender == address(this)` guard and reentrancy interactions.
-- Refund paths return tier subsidies to the current rewards vault address, which is admin-settable.
-- Tier benefits derive from instantaneous wallet balances by design (documented flash-loan stance in SECURITY.md).
+The following contracts do not yet exist and require separate audit coverage when implemented:
 
-## Test suite
+- `AssetRegistry`
+- `PackRegistry`
+- `PrizeInventoryVault`
+- `HoodPackzCore`
+- USDG jackpot vault
+- WETH payment router
 
-`cd contracts && forge test` — 68 tests, deterministic randomness. Reviewers are encouraged to extend the suite with adversarial cases; `MockSwapAdapter` supports failure, shallow-liquidity, and delivery-shortfall modes, and `MockPriceFeed` supports stale and out-of-bounds prices.
+Required pack invariants include three unique assets per pack, snapshot-only selection, exact 80/10/10 accounting, funded inventory, bounded jackpot liability, and eventual settlement or full refund.
+
+## Legacy exclusion
+
+Original StockPackz contracts are retained for attribution and migration analysis but are not the HoodPackz V2 target. Any reuse must be explicitly added to scope and reviewed as new V2 code.
+
+## Verification
+
+```bash
+cd contracts
+forge fmt --check
+forge build --sizes
+forge test
+```
+
+Before mainnet, add production verifier vectors, asset-admission tests, invariants, Robinhood Chain fork tests, static analysis, deployment rehearsal, and an independent external audit.

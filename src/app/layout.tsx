@@ -14,26 +14,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "StockPackz | Robinhood Chain",
-  description: "Open packs. Own tokenized stocks on Robinhood Chain.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  title: "HoodPackz | Meme Packs on Robinhood Chain",
+  description:
+    "Open three-token meme packs backed by bonded threshold randomness on Robinhood Chain.",
   icons: {
-    // Solid dark icons — transparent PNGs render as unpredictable shapes in
-    // tabs, home screens, and pinned sites.
-    icon: "/graphics/stockpackz-touch-icon.png",
-    apple: "/apple-touch-icon.png",
+    icon: "/icon.svg",
   },
   openGraph: {
-    title: "StockPackz",
-    description: "Open packs. Own tokenized stocks on Robinhood Chain.",
-    images: [{ url: "/graphics/og-image.png", width: 1200, height: 630 }],
+    title: "HoodPackz",
+    description: "Three-token meme packs backed by bonded threshold randomness.",
   },
   twitter: {
-    card: "summary_large_image",
-    site: "@stockpackz",
-    creator: "@stockpackz",
-    title: "StockPackz",
-    description: "Open packs. Own tokenized stocks on Robinhood Chain.",
-    images: ["/graphics/og-image.png"],
+    card: "summary",
+    title: "HoodPackz",
+    description: "Three-token meme packs backed by bonded threshold randomness.",
   },
 };
 

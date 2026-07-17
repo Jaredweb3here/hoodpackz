@@ -1,102 +1,87 @@
-# Architecture
+# HoodPackz V2 Architecture
 
-StockPackz is a modular protocol: a core settlement engine surrounded by optional, interface-connected modules. The core never depends on any module being present — the base product functions with every optional module unset.
+HoodPackz V2 separates pack settlement from bonded randomness. The randomness subsystem is implemented; the pack and asset subsystems remain design targets and are not deployed.
 
-## System overview
+## System map
 
 ```mermaid
 flowchart TD
-    subgraph Client
-        U([User Wallet])
-        FE[Next.js Frontend]
-        SDK["@stockpackz/sdk"]
-    end
+    U[User wallet] --> FE[Next.js frontend]
+    FE -. enabled only after audited deployment .-> CORE[HoodPackzCore]
+    CORE --> PR[PackRegistry]
+    CORE --> AR[AssetRegistry]
+    CORE --> INV[PrizeInventoryVault]
+    CORE --> JP[USDG Jackpot]
+    CORE --> ROUTER[WETH to USDG router]
+    CORE --> BEACON[ThresholdRandomBeacon]
 
-    subgraph Core["Settlement Core"]
-        SP[StockPackz]
-        VRF[Randomness Coordinator]
-        ADP[UniswapV4Adapter]
-    end
-
-    subgraph Vaults
-        JP[(Jackpot Vault)]
-        TR[(Treasury)]
-        RW[(Pack Rewards Vault)]
-        JS[(Jackpot Support Vault)]
-    end
-
-    subgraph Token["Optional Token Layer"]
-        TOK[StockPackzToken]
-        MT[MembershipTierManager]
-        XP[XPManager]
-        REG[LevelUnlockRegistry]
-        PA[OracleTokenPriceAdapter]
-        CV[TaxVaultConverter]
-    end
-
-    U -->|openPack| SP
-    FE --> SDK --> SP
-    SP <-->|request / fulfill| VRF
-    SP -->|exact-input swap| ADP -->|stock → user| U
-    SP --> JP & TR
-    TOK -->|1% tax 50/50| RW & JS
-    CV -->|USDG| JP & RW
-    MT & XP & PA -.->|interfaces, all optional| SP
-    XP --- REG
+    BEACON --> REG[BeaconOperatorRegistry]
+    BEACON --> BOND[OperatorBondVault]
+    BEACON --> VER[IThresholdSignatureVerifier]
+    REG --> OPS[7 operator share keys]
+    BOND --> CAP[4-smallest-bonds exposure cap]
 ```
 
-## Contract map
+Solid boxes in the randomness branch exist in the repository. Pack settlement boxes are planned V2 modules.
 
-| Contract | Responsibility |
-| --- | --- |
-| `StockPackz` | Pack configs, opening state machine, jackpot, liability accounting |
-| `UniswapV4Adapter` | Routing behind `IStockSwapAdapter`: allowlists, pair flags, liquidity floors |
-| `StockPackzToken` | Optional ERC-20; 1% transfer tax split 50/50 into two vaults; no reflections, no buyback |
-| `TaxVaultConverter` | Keeper-driven, slippage-bounded conversion of taxed tokens into USDG |
-| `PackRewardsVault` | Pre-funded USDG for subsidies, key packs, and rewards; pull-or-fallback semantics |
-| `MembershipTierManager` | Configurable tiers: discounts, subsidies, XP multipliers, access flags |
-| `XPManager` | Settlement-gated XP, configurable level curve, seasons/streak/prestige fields |
-| `LevelUnlockRegistry` | Additive level → unlock mapping; new rewards without core changes |
-| `PackCredits` | Non-transferable USDG-backed credits with weekly epochs |
-| `CollectionBadges` | Soulbound achievement NFTs with on-chain balance verification |
-| `OracleTokenPriceAdapter` | Staleness- and bounds-checked USD pricing for burn quantities |
+## Randomness lifecycle
 
-## Opening lifecycle
+1. The consumer requests randomness with explicit economic exposure.
+2. The registry resolves the active append-only key epoch.
+3. Four operator bonds are locked to cover the request exposure.
+4. The round is sealed, starting signing and rescue deadlines.
+5. The normal path verifies one aggregate threshold signature.
+6. The rescue path verifies attributable shares and identifies missing operators.
+7. Signature-derived randomness becomes immutable.
+8. Consumer delivery executes separately and can be retried without changing randomness.
+9. Bonds unlock or are slashed according to the finalized round outcome.
+
+## Randomness invariants
+
+1. Explicit zero exposure and the legacy one-argument request API fail closed.
+2. Exposure cannot exceed the sum of the four smallest available operator bonds.
+3. Pending withdrawals do not count as available collateral.
+4. Signing deadlines begin at sealing, not at request creation.
+5. Master and share keys are validated by the same verifier used by the beacon.
+6. The beacon rejects a registry configured with a different verifier.
+7. Final randomness cannot change because callback delivery failed.
+
+## Planned pack lifecycle
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Created: openPack (funds pulled, config snapshotted)
-    Created --> RandomnessRequested: request 2 words
-    RandomnessRequested --> RandomnessFulfilled: coordinator callback
-    RandomnessRequested --> CancelledAndRefunded: timeout → user cancel
-    RandomnessFulfilled --> Settled: swap succeeds → fees finalize → XP
-    RandomnessFulfilled --> SettlementFailed: swap fails (caught)
-    SettlementFailed --> Settled: bounded retry
-    SettlementFailed --> Refunded: full refund
-    Settled --> [*]
-    Refunded --> [*]
-    CancelledAndRefunded --> [*]
+    [*] --> Committed: payment and pack version snapshotted
+    Committed --> RandomnessRequested: explicit exposure locked
+    RandomnessRequested --> RandomnessFinalized: threshold signature verified
+    RandomnessFinalized --> Reserved: 3 unique assets sampled without replacement
+    Reserved --> Settled: inventory delivered and accounting finalized
+    Reserved --> Recoverable: delivery failed
+    Recoverable --> Settled: retry succeeds
+    Recoverable --> Refunded: bounded recovery expires
 ```
 
-Key invariants:
+The implementation must snapshot pack version, admitted assets, weights, economics, jackpot parameters, and delivery bounds before randomness is known.
 
-1. **Payment before selection.** Randomness is requested only after funds are committed; the stock cannot be known earlier.
-2. **Snapshots are law.** Stock sets, weights, fees, jackpot odds, adapter, and tier benefits are frozen per opening. Admin changes affect only future openings.
-3. **Fees follow settlement.** Treasury and jackpot legs finalize only when the stock purchase succeeds.
-4. **Liabilities are untouchable.** `withdrawTreasury` is capped at accrued fees and can never dip into pending settlements or the jackpot.
+## Economic model
 
-## Economic flow
+Each pack tier is denominated in USDG:
 
-Every default opening splits 10 USDG:
+| Tier | Price | Prize EV | Jackpot | Protocol |
+| --- | ---: | ---: | ---: | ---: |
+| Corner | 5 | 4 | 0.5 | 0.5 |
+| Block | 15 | 12 | 1.5 | 1.5 |
+| City | 50 | 40 | 5 | 5 |
 
-| Leg | Amount | Notes |
-| --- | --- | --- |
-| Stock purchase | 9.00 | + optional tier subsidy pulled from the Rewards Vault |
-| Treasury | 0.60 | − holder discount (discount can never exceed this leg) |
-| Jackpot | 0.40 | Fixed, never discounted |
+The jackpot must be funded and exposure-capped. Fixed operator bonds cannot secure an uncapped jackpot.
 
-Token holders additionally burn ≈ $0.05 of STOCKPACKZ per opening (oracle-priced); non-holders pay a 0.20 USDG surcharge instead. The guaranteed stock leg is identical in both flows.
+## Asset admission
 
-## Frontend
+The planned registry is versioned and fail-closed. Assets require code-hash and ownership review, transfer-behavior tests, liquidity bounds, decimals validation, and emergency disable controls. Fee-on-transfer, rebasing, blacklistable, owner-mintable, and unsafe proxy assets are excluded.
 
-The Next.js app mirrors the on-chain state machine (`src/lib/protocol.ts`) and gates the reveal animation on the authoritative server draw. API routes under `src/app/api/*` simulate the production indexer surface: jackpot, activity, stocks, and pack opening.
+## Frontend boundary
+
+The frontend exposes wallet connection, network switching, pack previews, economics, and protocol status. Without a configured HoodPackz V2 core address and ABI, its purchase control remains disabled and `/api/packs/open` returns `V2_NOT_DEPLOYED`.
+
+## Legacy boundary
+
+Original StockPackz contracts and stock-oriented modules remain in the repository for attribution and migration analysis. They are not dependencies of the HoodPackz V2 root application and must not be presented as the V2 mainnet path.
