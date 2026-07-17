@@ -113,6 +113,7 @@ export default function HoodPackzPage() {
         <HoodPackzBrand href="#top" />
         <nav className="hp-nav" aria-label="Primary navigation">
           <a href="#packs">PACKS</a>
+          <a href="#assets">TOKENS</a>
           <a href="#proof">PROOF</a>
           <a href="#economics">ECONOMICS</a>
         </nav>
@@ -243,6 +244,58 @@ export default function HoodPackzPage() {
         <div><ShieldCheck size={16} /><span>COLLATERAL</span><strong>EXPOSURE CAPPED</strong></div>
         <div><Zap size={16} /><span>SETTLEMENT</span><strong>ROBINHOOD CHAIN</strong></div>
         <div className="hp-status-warning"><TriangleAlert size={16} /><span>CORE</span><strong>NOT DEPLOYED</strong></div>
+      </section>
+
+      <section id="assets" className="hp-assets" aria-labelledby="assets-heading">
+        <div className="hp-assets-head">
+          <div>
+            <span className="hp-section-label">ROBINHOOD CHAIN / VERIFIED ERC-20</span>
+            <h2 id="assets-heading">THE REAL TOKEN POOL.</h2>
+          </div>
+          <div className="hp-assets-state">
+            <span>CONTRACTS</span>
+            <strong>7 / 7 ONCHAIN</strong>
+            <small>PACK RESERVES NOT FUNDED</small>
+          </div>
+        </div>
+
+        <div className="hp-token-registry">
+          <div className="hp-token-registry-head" aria-hidden="true">
+            <span>ASSET</span>
+            <span>CONTRACT</span>
+            <span>DECIMALS</span>
+            <span>EXPLORER</span>
+          </div>
+          {HOODPACKZ_TOKENS.map((token, index) => (
+            <a
+              key={token.address}
+              className="hp-token-registry-row"
+              href={tokenExplorerUrl(token.address)}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${token.name} contract on Blockscout`}
+            >
+              <span className="hp-token-identity">
+                <i style={{ background: token.color }}>{token.ticker.slice(0, 1)}</i>
+                <span>
+                  <strong>{token.ticker}</strong>
+                  <small>{token.name}</small>
+                </span>
+              </span>
+              <code>{token.address}</code>
+              <span className="hp-token-decimals">{token.decimals}</span>
+              <span className="hp-token-explorer">
+                VIEW <ExternalLink size={13} />
+              </span>
+              <span className="hp-token-number">0{index + 1}</span>
+            </a>
+          ))}
+        </div>
+
+        <p className="hp-assets-note">
+          These contracts exist on Robinhood Chain mainnet. HoodPackz will not distribute them
+          until liquidity admission, inventory funding, and the V2 pack core are complete.
+        </p>
       </section>
 
       <section id="economics" className="hp-economics" aria-labelledby="economics-heading">
