@@ -1,21 +1,29 @@
-# HoodPackz
+# Pakz.fun
 
-**On-chain meme token packs. Three tokens per pull. Real randomness with slashable collateral.**
+**Onchain token drops. Three funded rewards per pull. Simple beta settlement.**
 
-[![Mainnet](https://img.shields.io/badge/mainnet-LIVE-00c853?style=flat-square&logo=ethereum)](https://hoodpackz.fun)
+[![Mainnet](https://img.shields.io/badge/mainnet-LIVE-2e7d32?style=flat-square&logo=ethereum)](https://pakz.fun)
 [![Chain](https://img.shields.io/badge/Robinhood_Chain-4663-1565c0?style=flat-square)](https://robinhoodchain.blockscout.com)
 [![Contracts](https://img.shields.io/github/actions/workflow/status/Jaredweb3here/hoodpackz/contracts.yml?branch=main&label=contracts&style=flat-square)](https://github.com/Jaredweb3here/hoodpackz/actions/workflows/contracts.yml)
 [![Frontend](https://img.shields.io/github/actions/workflow/status/Jaredweb3here/hoodpackz/frontend.yml?branch=main&label=frontend&style=flat-square)](https://github.com/Jaredweb3here/hoodpackz/actions/workflows/frontend.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
-[![Forge Tests](https://img.shields.io/badge/forge-106_passed-brightgreen?style=flat-square)](contracts/)
+[![Forge Tests](https://img.shields.io/badge/forge-passing-brightgreen?style=flat-square)](contracts/)
+
+**CA:** [`0x558530c1e1c58e0a90e98ea735d0f4f0147f7777`](https://robinhoodchain.blockscout.com/address/0x558530c1e1c58e0a90e98ea735d0f4f0147f7777)
+
+**X:** [@pakzdotfun](https://x.com/pakzdotfun)
 
 ---
 
-## What is HoodPackz
+## What is Pakz.fun
 
-You pay USDG. You get three real ERC-20 meme tokens from a seven-asset pool. Which three is determined by a threshold BLS beacon — four independent operator signatures, each backed by slashable collateral. The randomness is onchain, the operators can be slashed if they cheat, and every dollar is accounted for in a published split.
+You pay USDG. You get three real ERC-20 meme tokens from a seven-asset pool. The beta fixes a future Robinhood block when the purchase is created and derives the draw from that block hash. Anyone can finalize the draw after the block exists. Every possible prize is reserved before payment and every dollar follows a published split.
 
-**[→ Open a pack at hoodpackz.fun](https://hoodpackz.fun)**
+**[Open the live mainnet app at pakz.fun](https://pakz.fun)**
+
+Pack sales remain fail-closed until the simplified coordinator and replacement core are deployed, funded, audited, and proven with one real end-to-end opening. See the [mainnet status report](docs/15-mainnet-status.md).
+
+The 4-of-7 threshold BLS system remains visible in source as an experimental upgrade under development. It is not the beta launch path. See [`contracts/src/randomness/THRESHOLD_BLS_EXPERIMENTAL.md`](contracts/src/randomness/THRESHOLD_BLS_EXPERIMENTAL.md).
 
 ---
 
@@ -23,9 +31,9 @@ You pay USDG. You get three real ERC-20 meme tokens from a seven-asset pool. Whi
 
 | Tier | Price | You get |
 |------|-------|---------|
-| Corner | 5 USDG | 3 tokens from the pool |
-| Block | 15 USDG | 3 tokens from the pool |
-| City | 50 USDG | 3 tokens from the pool |
+| Trencher | 5 USDG | 3 tokens from the pool |
+| Cashcat Max | 15 USDG | 3 tokens from the pool |
+| Techpro | 50 USDG | 3 tokens from the pool |
 
 Higher tier = more tokens per slot. Same seven-asset pool, same randomness.
 
@@ -35,11 +43,9 @@ Higher tier = more tokens per slot. Same seven-asset pool, same randomness.
 
 | Contract | Address | Explorer |
 |----------|---------|---------|
-| **HoodPackzCore V2** | `0x5337Ad84857E433b7d57Ca1130079044Ef37e436` | [view](https://robinhoodchain.blockscout.com/address/0x5337Ad84857E433b7d57Ca1130079044Ef37e436) |
-| **ThresholdRandomBeacon** | `0x2B4547eAf629dE637C28146C3104e83f1F0AE7dc` | [view](https://robinhoodchain.blockscout.com/address/0x2B4547eAf629dE637C28146C3104e83f1F0AE7dc) |
-| **BLS12381Verifier** | `0xf500CBd6bE6CCa621a0Bca39e384729E51ECF1c8` | [view](https://robinhoodchain.blockscout.com/address/0xf500CBd6bE6CCa621a0Bca39e384729E51ECF1c8) |
-| **BeaconOperatorRegistry** | `0xFbE3C11728676604f90ea637450B6FEd24af3bb0` | [view](https://robinhoodchain.blockscout.com/address/0xFbE3C11728676604f90ea637450B6FEd24af3bb0) |
-| **OperatorBondVault** | `0x70AFe9e397E0daF274368C6DEbd485F01B7c7E8D` | [view](https://robinhoodchain.blockscout.com/address/0x70AFe9e397E0daF274368C6DEbd485F01B7c7E8D) |
+| **Legacy HoodPackzCore V2 (paused)** | `0x5337Ad84857E433b7d57Ca1130079044Ef37e436` | [view](https://robinhoodchain.blockscout.com/address/0x5337Ad84857E433b7d57Ca1130079044Ef37e436) |
+| **Archived ThresholdRandomBeacon** | `0x2B4547eAf629dE637C28146C3104e83f1F0AE7dc` | [view](https://robinhoodchain.blockscout.com/address/0x2B4547eAf629dE637C28146C3104e83f1F0AE7dc) |
+| **Archived BLS12381Verifier** | `0xf500CBd6bE6CCa621a0Bca39e384729E51ECF1c8` | [view](https://robinhoodchain.blockscout.com/address/0xf500CBd6bE6CCa621a0Bca39e384729E51ECF1c8) |
 | **USDG** | `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168` | [view](https://robinhoodchain.blockscout.com/address/0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168) |
 
 ---
@@ -72,16 +78,16 @@ Every pack purchase follows one fixed split, enforced onchain:
 
 ---
 
-## How randomness works
+## How beta randomness works
 
 ```
-1. REQUEST   — pack commits value before any randomness round is sealed
-2. SIGN      — 4-of-7 operators produce threshold BLS shares against bonded collateral
-3. FINALIZE  — one aggregate BLS signature becomes the immutable random seed
-4. DELIVER   — retryable delivery; randomness is final even if delivery is retried
+1. REQUEST   — the purchase fixes a future Robinhood block number
+2. WAIT      — all possible prizes and payment liabilities stay reserved
+3. FINALIZE  — anyone derives the random words from that fixed block hash
+4. CLAIM     — the user claims three unique tokens, or refunds if the hash expires
 ```
 
-The beacon uses EIP-2537 BLS12-381 precompiles (confirmed on chain 4663). Operators can be slashed via `OperatorBondVault` if they behave incorrectly.
+The finalizer supplies no entropy and has no privileged role. This is a transparent beta mechanism, not VRF: Robinhood block producers can influence block contents and, in an extreme case, a block hash. The planned threshold BLS upgrade is retained in source but is not required for beta sales.
 
 ---
 
@@ -93,10 +99,9 @@ flowchart LR
     FE -->|attested direct tx| CORE[HoodPackzCore V2]
     CORE --> INV[Inventory reserve]
     CORE --> JP[USDG jackpot vault]
-    CORE --> BEACON[ThresholdRandomBeacon]
-    BEACON --> OPS[4-of-7 bonded operators]
-    OPS --> BOND[OperatorBondVault]
-    BEACON --> VER[BLS12381Verifier\nEIP-2537]
+    CORE --> COORD[HoodPackzMvpCoordinator]
+    COORD --> BLOCK[Fixed future block hash]
+    K[Permissionless finalizer] --> COORD
 ```
 
 ---
@@ -104,15 +109,15 @@ flowchart LR
 ## Repository structure
 
 ```
-contracts/         Foundry — HoodPackzCore V2, beacon stack, 106 tests
+contracts/         Foundry — HoodPackzCore, MVP coordinator, experimental BLS stack
   src/v2/          HoodPackzCore.sol
-  src/randomness/  ThresholdRandomBeacon, BLS12381Verifier, registry, vault
-  script/          Deploy scripts (beacon + core)
+  src/randomness/  HoodPackzMvpCoordinator plus archived threshold upgrade
+  script/          MVP and experimental deployment scripts
   test/            Full Forge test suite
 src/               Next.js 14 frontend
   app/             page.tsx — pack UI
   lib/             chain, tokens, contract interaction
-scripts/           DKG ceremony (dkg.mjs), BLS signing (sign-round.mjs)
+scripts/           Mainnet simulation plus experimental DKG/BLS tooling
 ```
 
 ---
@@ -127,7 +132,7 @@ npm run dev          # http://localhost:3000
 ```bash
 cd contracts
 forge build
-forge test           # 106 passed
+forge test
 ```
 
 ---
@@ -137,6 +142,7 @@ forge test           # 106 passed
 - Frontend verifies codehash and constructor config hash before every transaction
 - Pack sales are fail-closed (`openingsPaused = true` by default)
 - No operator private keys or deployer keys on Vercel
+- Future-block finalization requires no privileged entropy signer
 - Full Forge suite: unit, integration, fork tests
 
 See [SECURITY.md](SECURITY.md) for threat model and [AUDIT_SCOPE.md](AUDIT_SCOPE.md) for scope.

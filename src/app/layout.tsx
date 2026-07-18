@@ -15,21 +15,21 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: "HoodPackz | Meme Packs on Robinhood Chain",
+  title: "Pakz.fun | Onchain Token Drops",
   description:
-    "Open three-token meme packs using future-block beta randomness on Robinhood Chain.",
+    "Open three-token drops using future-block beta randomness on Robinhood Chain.",
   icons: {
     icon: "/favicon.png",
     apple: "/favicon.png",
   },
   openGraph: {
-    title: "HoodPackz",
-    description: "Three-token meme packs using future-block beta randomness.",
+    title: "Pakz.fun",
+    description: "Three-token drops using future-block beta randomness.",
   },
   twitter: {
     card: "summary",
-    title: "HoodPackz",
-    description: "Three-token meme packs using future-block beta randomness.",
+    title: "Pakz.fun",
+    description: "Three-token drops using future-block beta randomness.",
   },
 };
 

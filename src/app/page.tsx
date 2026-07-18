@@ -43,25 +43,25 @@ import { DemoPackOpening } from "@/components/hoodpackz/demo-pack-opening";
 
 const TIERS = [
   {
-    name: "Corner",
+    name: "Trencher",
     price: 5,
-    label: "ENTRY",
-    image: "/corner-pack.png",
-    note: "The first pull. Three unique token rewards from the full seven-asset pool.",
+    label: "DROP 01",
+    image: "/trencher-pack.png",
+    note: "The opener. Three unique token rewards from the full seven-asset pool.",
   },
   {
-    name: "Block",
+    name: "Cashcat Max",
     price: 15,
-    label: "CORE",
-    image: "/block-pack.png",
-    note: "The standard drop with larger token allocations and the same sealed draw.",
+    label: "DROP 02",
+    image: "/cashcat-max-pack.png",
+    note: "A heavier drop with larger token allocations and the same sealed draw.",
   },
   {
-    name: "City",
+    name: "Techpro",
     price: 50,
-    label: "HEAT",
-    image: "/city-pack.png",
-    note: "The top tier. Maximum configured rewards when City inventory is fully backed.",
+    label: "DROP 03",
+    image: "/techpro-pack.png",
+    note: "The top drop. Maximum configured rewards when its inventory is fully backed.",
   },
 ] as const;
 
@@ -169,7 +169,7 @@ export default function HoodPackzPage() {
   const { address, isConnected, chainId } = useAccount();
   const { connect, connectors, isPending: connecting } = useConnect();
   const { switchChain, isPending: switching } = useSwitchChain();
-  const [tierIndex, setTierIndex] = useState(1);
+  const [tierIndex, setTierIndex] = useState(0);
   const [openingState, setOpeningState] = useState<"idle" | "approving" | "submitting">("idle");
   const [claiming, setClaiming] = useState<string | null>(null);
   const [openingError, setOpeningError] = useState<string | null>(null);
@@ -185,6 +185,7 @@ export default function HoodPackzPage() {
   const openingContext = useRef<bigint | null>(null);
   const tier = TIERS[tierIndex];
   const isLive = Boolean(HOODPACKZ_V2_ADDRESS) && HOODPACKZ_PACK_SALES_LIVE;
+  const tierIsLive = isLive && tierIndex === 0;
   const canRecover = HOODPACKZ_V2_RECOVERY_AVAILABLE;
 
   function walletMatches(expectedAddress: `0x${string}`) {
@@ -252,7 +253,7 @@ export default function HoodPackzPage() {
     setOpeningError(null);
     setSubmission(null);
 
-    if (!isLive) return;
+    if (!tierIsLive) return;
     if (!isConnected || !address) {
       if (connectors[0]) connect({ connector: connectors[0] });
       return;
@@ -331,6 +332,8 @@ export default function HoodPackzPage() {
 
   const actionLabel = !isLive
     ? "SALES PAUSED"
+    : !tierIsLive
+      ? "TIER PAUSED"
     : !isConnected
       ? connecting
         ? "CONNECTING WALLET"
@@ -354,7 +357,7 @@ export default function HoodPackzPage() {
           <a href="#assets">TOKENS</a>
           <a href="#proof">PROOF</a>
           <a href="#economics">ECONOMICS</a>
-          <a href="https://x.com/hoodpackz_fun" target="_blank" rel="noreferrer">X / @HOODPACKZ_FUN</a>
+          <a href="https://x.com/pakzdotfun" target="_blank" rel="noreferrer">X / @PAKZDOTFUN</a>
         </nav>
         <HoodWalletButton />
       </header>
@@ -398,7 +401,7 @@ export default function HoodPackzPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.9, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
           role="radiogroup"
-          aria-label="Choose a HoodPackz tier"
+          aria-label="Choose a Pakz.fun drop"
         >
           {TIERS.map((option, index) => (
             <motion.button
@@ -419,7 +422,7 @@ export default function HoodPackzPage() {
               <span className="hp-pack-card-art">
                 <Image
                   src={option.image}
-                  alt={`${option.name} HoodPackz pack`}
+                  alt={`${option.name} Pakz.fun pack`}
                   width={1024}
                   height={1536}
                   priority={index === 1}
@@ -497,11 +500,11 @@ export default function HoodPackzPage() {
 
           <button
             type="button"
-            className={isLive ? "hp-open-action" : "hp-locked-action"}
-            disabled={!isLive || openingState !== "idle" || connecting || switching}
+            className={tierIsLive ? "hp-open-action" : "hp-locked-action"}
+            disabled={!tierIsLive || openingState !== "idle" || connecting || switching}
             onClick={openSelectedPack}
           >
-            {isLive ? <Zap size={17} /> : <LockKeyhole size={17} />}
+            {tierIsLive ? <Zap size={17} /> : <LockKeyhole size={17} />}
             {actionLabel}
           </button>
           <button type="button" className="hp-demo-action" onClick={() => setDemoOpen(true)}>
@@ -521,8 +524,10 @@ export default function HoodPackzPage() {
               </>
             ) : openingError ? (
               <span className="hp-action-error">{openingError}</span>
-            ) : isLive ? (
+            ) : tierIsLive ? (
               "Payment is submitted from your wallet. Three funded rewards settle from a future Robinhood block hash."
+            ) : isLive ? (
+              "TRENCHER IS LIVE. CASHCAT MAX AND TECHPRO REMAIN PAUSED UNTIL THEIR INVENTORY IS FULLY FUNDED."
             ) : (
               "ONCHAIN SALES ARE PAUSED WHILE THE SIMPLIFIED BETA CORE AND INVENTORY ARE ACTIVATED."
             )}
@@ -782,16 +787,16 @@ export default function HoodPackzPage() {
           <nav aria-label="Footer navigation">
             <a href="#packs">Packs <ArrowUpRight size={18} /></a>
             <a href="#assets">Token pool <ArrowUpRight size={18} /></a>
-            <a href="https://x.com/hoodpackz_fun" target="_blank" rel="noreferrer">X / @hoodpackz_fun <ArrowUpRight size={18} /></a>
+            <a href="https://x.com/pakzdotfun" target="_blank" rel="noreferrer">X / @pakzdotfun <ArrowUpRight size={18} /></a>
             <a href="https://github.com/Jaredweb3here/hoodpackz" target="_blank" rel="noreferrer">Source <Code2 size={18} /></a>
           </nav>
         </div>
-        <div className="hp-footer-word" aria-hidden="true">HOODPACKZ</div>
+        <div className="hp-footer-word" aria-hidden="true">PAKZ.FUN</div>
         <div className="hp-footer-base">
           <HoodPackzBrand />
           <p>ROBINHOOD CHAIN / 4663 / BETA</p>
           <div>
-            <a href="https://x.com/hoodpackz_fun" target="_blank" rel="noreferrer" aria-label="HoodPackz on X">X</a>
+            <a href="https://x.com/pakzdotfun" target="_blank" rel="noreferrer" aria-label="Pakz.fun on X">X</a>
             <a href="https://robinhoodchain.blockscout.com" target="_blank" rel="noreferrer" aria-label="Robinhood Chain explorer"><ExternalLink size={18} /></a>
           </div>
         </div>

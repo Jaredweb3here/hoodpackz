@@ -4,8 +4,8 @@ import { ArrowLeft, ArrowUpRight, Check, Clock3, LockKeyhole, ShieldCheck } from
 import { HoodPackzBrand } from "@/components/brand/hoodpackz-brand";
 
 export const metadata: Metadata = {
-  title: "Protocol Status | HoodPackz",
-  description: "HoodPackz V2 architecture, launch gates, economics, and deployment status.",
+  title: "Protocol Status | Pakz.fun",
+  description: "Pakz.fun architecture, launch gates, economics, and deployment status.",
 };
 
 const STATUS = [
