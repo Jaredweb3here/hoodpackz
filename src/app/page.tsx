@@ -39,6 +39,7 @@ import {
 } from "@/lib/hoodpackz-v2";
 import { HOODPACKZ_TOKENS, tokenExplorerUrl } from "@/lib/hoodpackz-tokens";
 import { HoodPackzBrand } from "@/components/brand/hoodpackz-brand";
+import { DemoPackOpening } from "@/components/hoodpackz/demo-pack-opening";
 
 const TIERS = [
   {
@@ -176,6 +177,7 @@ export default function HoodPackzPage() {
   const [trackedOpeningIds, setTrackedOpeningIds] = useState<bigint[]>([]);
   const [trackedOpeningId, setTrackedOpeningId] = useState<bigint | null>(null);
   const [opening, setOpening] = useState<HoodPackzOpening | null>(null);
+  const [demoOpen, setDemoOpen] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const heroPackY = useTransform(scrollYProgress, [0, 0.22], [0, prefersReducedMotion ? 0 : -72]);
@@ -502,6 +504,9 @@ export default function HoodPackzPage() {
             {isLive ? <Zap size={17} /> : <LockKeyhole size={17} />}
             {actionLabel}
           </button>
+          <button type="button" className="hp-demo-action" onClick={() => setDemoOpen(true)}>
+            <Dices size={17} /> OPEN TEST PACK
+          </button>
           <p className="hp-action-note" aria-live="polite">
             {submission ? (
               <>
@@ -791,6 +796,7 @@ export default function HoodPackzPage() {
           </div>
         </div>
       </footer>
+      <DemoPackOpening open={demoOpen} pack={tier} onClose={() => setDemoOpen(false)} />
     </main>
   );
 }
