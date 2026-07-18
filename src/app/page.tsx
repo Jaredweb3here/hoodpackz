@@ -352,7 +352,7 @@ export default function HoodPackzPage() {
           <a href="#assets">TOKENS</a>
           <a href="#proof">PROOF</a>
           <a href="#economics">ECONOMICS</a>
-          <a href="https://x.com/hoodpackz" target="_blank" rel="noreferrer">X / HOODPACKZ</a>
+          <a href="https://x.com/hoodpackz_fun" target="_blank" rel="noreferrer">X / @HOODPACKZ_FUN</a>
         </nav>
         <HoodWalletButton />
       </header>
@@ -707,9 +707,9 @@ export default function HoodPackzPage() {
             </p>
           </div>
           <div className="hp-split" aria-label="Pack proceeds: 80 percent inventory funding, 10 percent jackpot, 10 percent protocol">
-            <div className="hp-split-prize" style={{ width: "80%" }}>80%</div>
-            <div className="hp-split-jackpot" style={{ width: "10%" }}>10%</div>
-            <div className="hp-split-fee" style={{ width: "10%" }}>10%</div>
+            <div className="hp-split-prize">80%</div>
+            <div className="hp-split-jackpot">10%</div>
+            <div className="hp-split-fee">10%</div>
           </div>
           <div className="hp-ledger">
             <div><Coins /><span>INVENTORY</span><strong>80%</strong><small>Funds admitted token reserves</small></div>
@@ -777,7 +777,7 @@ export default function HoodPackzPage() {
           <nav aria-label="Footer navigation">
             <a href="#packs">Packs <ArrowUpRight size={18} /></a>
             <a href="#assets">Token pool <ArrowUpRight size={18} /></a>
-            <a href="https://x.com/hoodpackz" target="_blank" rel="noreferrer">X / @hoodpackz <ArrowUpRight size={18} /></a>
+            <a href="https://x.com/hoodpackz_fun" target="_blank" rel="noreferrer">X / @hoodpackz_fun <ArrowUpRight size={18} /></a>
             <a href="https://github.com/Jaredweb3here/hoodpackz" target="_blank" rel="noreferrer">Source <Code2 size={18} /></a>
           </nav>
         </div>
@@ -786,7 +786,7 @@ export default function HoodPackzPage() {
           <HoodPackzBrand />
           <p>ROBINHOOD CHAIN / 4663 / BETA</p>
           <div>
-            <a href="https://x.com/hoodpackz" target="_blank" rel="noreferrer" aria-label="HoodPackz on X">X</a>
+            <a href="https://x.com/hoodpackz_fun" target="_blank" rel="noreferrer" aria-label="HoodPackz on X">X</a>
             <a href="https://robinhoodchain.blockscout.com" target="_blank" rel="noreferrer" aria-label="Robinhood Chain explorer"><ExternalLink size={18} /></a>
           </div>
         </div>
