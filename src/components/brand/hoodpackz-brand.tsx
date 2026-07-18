@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 interface HoodPackzBrandProps {
   href?: string;
@@ -9,7 +10,7 @@ export function HoodPackzBrand({ href = "/", compact = false }: HoodPackzBrandPr
   return (
     <Link href={href} className="hp-brand" aria-label="HoodPackz home">
       <span className="hp-brand-mark" aria-hidden="true">
-        HP
+        <Image src="/hoodpackz-logo.png" alt="" width={34} height={34} priority />
       </span>
       {!compact && <span>HOODPACKZ</span>}
     </Link>

@@ -19,7 +19,8 @@ export const metadata: Metadata = {
   description:
     "Open three-token meme packs using future-block beta randomness on Robinhood Chain.",
   icons: {
-    icon: "/icon.svg",
+    icon: "/favicon.png",
+    apple: "/favicon.png",
   },
   openGraph: {
     title: "HoodPackz",
