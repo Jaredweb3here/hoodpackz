@@ -1,19 +1,19 @@
 import { NextResponse } from "next/server";
 
-function retired() {
+function status() {
   return NextResponse.json(
     {
-      error: "The single-keeper coordinator is retired. HoodPackz V2 uses bonded threshold signatures.",
-      code: "LEGACY_KEEPER_RETIRED",
+      message: "No privileged keeper API is required. MVP draws can be finalized permissionlessly after their target block.",
+      code: "PERMISSIONLESS_FINALIZATION",
     },
-    { status: 410 }
+    { status: 200 }
   );
 }
 
 export async function GET() {
-  return retired();
+  return status();
 }
 
 export async function POST() {
-  return retired();
+  return status();
 }

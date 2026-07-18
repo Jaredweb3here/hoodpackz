@@ -1,6 +1,7 @@
 import { formatUnits, keccak256, parseEventLogs } from "viem";
 import {
   getAccount,
+  getBlockNumber,
   getBytecode,
   readContract,
   waitForTransactionReceipt,
@@ -151,6 +152,27 @@ const beaconAbi = [
     inputs: [{ name: "roundId", type: "uint256" }],
     outputs: [{ type: "uint8" }],
   },
+  {
+    type: "function",
+    name: "targetBlock",
+    stateMutability: "view",
+    inputs: [{ name: "requestId", type: "uint256" }],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "fulfill",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "requestId", type: "uint256" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "cancelExpired",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "requestId", type: "uint256" }],
+    outputs: [],
+  },
 ] as const;
 
 export type OpeningSubmission = {
@@ -173,6 +195,9 @@ export type HoodPackzOpening = {
   jackpotWinner: boolean;
   jackpotClaimed: boolean;
   roundStatus: number;
+  targetBlock: bigint;
+  canFinalize: boolean;
+  canCancel: boolean;
 };
 
 function requireConfiguredCore(): `0x${string}` {
@@ -381,6 +406,19 @@ export async function readHoodPackzOpening(
     args: [opening.roundId],
     chainId: robinhoodChain.id,
   });
+  let targetBlock = 0n;
+  try {
+    targetBlock = await readContract(wagmiConfig, {
+      address: beacon,
+      abi: beaconAbi,
+      functionName: "targetBlock",
+      args: [opening.requestId],
+      chainId: robinhoodChain.id,
+    });
+  } catch {
+    // Legacy threshold openings remain readable and refundable while the MVP coordinator rolls out.
+  }
+  const currentBlock = targetBlock > 0n ? await getBlockNumber(wagmiConfig, { chainId: robinhoodChain.id }) : 0n;
   return {
     openingId,
     user: opening.user,
@@ -395,7 +433,71 @@ export async function readHoodPackzOpening(
     jackpotWinner: opening.jackpotWinner,
     jackpotClaimed: opening.jackpotClaimed,
     roundStatus,
+    targetBlock,
+    canFinalize: roundStatus === 1 && targetBlock > 0n && currentBlock > targetBlock,
+    canCancel: roundStatus === 1 && targetBlock > 0n && currentBlock > targetBlock + 256n,
   };
+}
+
+export async function finalizeHoodPackzOpening(
+  openingId: bigint,
+  account: `0x${string}`,
+): Promise<`0x${string}`> {
+  const core = await prepareCoreTransaction(account);
+  const opening = await readContract(wagmiConfig, {
+    address: core,
+    abi: hoodPackzV2Abi,
+    functionName: "getOpening",
+    args: [openingId],
+    chainId: robinhoodChain.id,
+  });
+  const coordinator = await readContract(wagmiConfig, {
+    address: core,
+    abi: hoodPackzV2Abi,
+    functionName: "beacon",
+    chainId: robinhoodChain.id,
+  });
+  const hash = await writeContract(wagmiConfig, {
+    address: coordinator,
+    abi: beaconAbi,
+    functionName: "fulfill",
+    args: [opening.requestId],
+    account,
+    chainId: robinhoodChain.id,
+  });
+  return confirmCoreTransaction(hash);
+}
+
+export async function cancelExpiredHoodPackzOpening(
+  openingId: bigint,
+  account: `0x${string}`,
+): Promise<`0x${string}`> {
+  const core = await prepareCoreTransaction(account);
+  const opening = await readContract(wagmiConfig, {
+    address: core,
+    abi: hoodPackzV2Abi,
+    functionName: "getOpening",
+    args: [openingId],
+    chainId: robinhoodChain.id,
+  });
+  const coordinator = await readContract(wagmiConfig, {
+    address: core,
+    abi: hoodPackzV2Abi,
+    functionName: "beacon",
+    chainId: robinhoodChain.id,
+  });
+  assertWalletContext(account);
+  const cancelHash = await writeContract(wagmiConfig, {
+    address: coordinator,
+    abi: beaconAbi,
+    functionName: "cancelExpired",
+    args: [opening.requestId],
+    account,
+    chainId: robinhoodChain.id,
+  });
+  await confirmCoreTransaction(cancelHash);
+  assertWalletContext(account);
+  return refundHoodPackzOpening(openingId, account);
 }
 
 export function formatOpeningAmount(amount: bigint, decimals: number): string {

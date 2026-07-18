@@ -17,18 +17,18 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "HoodPackz | Meme Packs on Robinhood Chain",
   description:
-    "Open three-token meme packs backed by bonded threshold randomness on Robinhood Chain.",
+    "Open three-token meme packs using future-block beta randomness on Robinhood Chain.",
   icons: {
     icon: "/icon.svg",
   },
   openGraph: {
     title: "HoodPackz",
-    description: "Three-token meme packs backed by bonded threshold randomness.",
+    description: "Three-token meme packs using future-block beta randomness.",
   },
   twitter: {
     card: "summary",
     title: "HoodPackz",
-    description: "Three-token meme packs backed by bonded threshold randomness.",
+    description: "Three-token meme packs using future-block beta randomness.",
   },
 };
 

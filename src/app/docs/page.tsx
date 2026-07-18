@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 };
 
 const STATUS = [
-  { name: "Bond registry", state: "Implemented", ready: true },
-  { name: "Operator bond vault", state: "Implemented", ready: true },
-  { name: "4-of-7 beacon state machine", state: "Implemented", ready: true },
-  { name: "Production EIP-2537 verifier", state: "Pending vectors", ready: false },
-  { name: "Meme asset registry", state: "Pending", ready: false },
-  { name: "Pack inventory and core", state: "Pending", ready: false },
+  { name: "Future-block MVP coordinator", state: "Implemented", ready: true },
+  { name: "Permissionless draw finalization", state: "Implemented", ready: true },
+  { name: "Full refund after entropy expiry", state: "Implemented", ready: true },
+  { name: "Threshold BLS upgrade", state: "Building / archived", ready: false },
+  { name: "Meme asset inventory", state: "Funding pending", ready: false },
+  { name: "Replacement mainnet deployment", state: "Pending", ready: false },
   { name: "External audit and legal review", state: "Required", ready: false },
 ] as const;
 
@@ -32,8 +32,8 @@ export default function DocsPage() {
           <h1>THE SPEC IS PUBLIC.<br />THE LAUNCH IS GATED.</h1>
         </div>
         <p>
-          HoodPackz will not accept approvals or funds until the meme-pack core, production BLS
-          verifier, asset controls, external audit, and legal review are complete.
+          HoodPackz beta uses a fixed future Robinhood block hash with permissionless finalization.
+          Sales remain disabled until the replacement core, inventory, audit, and legal gates are complete.
         </p>
       </section>
 
@@ -60,20 +60,20 @@ export default function DocsPage() {
       <section className="hp-docs-spec">
         <div><span>PACKS</span><strong>5 / 15 / 50 USDG</strong><p>Each pack resolves to three different admitted meme tokens.</p></div>
         <div><span>ECONOMICS</span><strong>80 / 10 / 10</strong><p>Prize EV, USDG jackpot, and protocol fee.</p></div>
-        <div><span>RANDOMNESS</span><strong>4-OF-7 BLS</strong><p>Bonded threshold signatures with attributable rescue shares.</p></div>
-        <div><span>EXPOSURE</span><strong>COLLATERAL CAPPED</strong><p>Value at risk cannot exceed slashable quorum capacity.</p></div>
+        <div><span>RANDOMNESS</span><strong>FUTURE BLOCK</strong><p>The target block is fixed before its hash exists.</p></div>
+        <div><span>RECOVERY</span><strong>FULL REFUND</strong><p>Expired entropy releases inventory and returns the purchase price.</p></div>
       </section>
 
       <section className="hp-docs-principles">
         <div>
           <span className="hp-section-label">NON-NEGOTIABLES</span>
-          <h2>WHAT V2 WILL<br />NOT TRUST.</h2>
+          <h2>WHAT THE BETA<br />STILL PROTECTS.</h2>
         </div>
         <ul>
-          <li><ShieldCheck size={18} /><span>No timestamp, blockhash, prevrandao, or single keeper as entropy.</span></li>
-          <li><ShieldCheck size={18} /><span>No fee-on-transfer, rebasing, blacklistable, or owner-mintable prize assets.</span></li>
-          <li><ShieldCheck size={18} /><span>No uncapped jackpot exposure against fixed operator bonds.</span></li>
-          <li><ShieldCheck size={18} /><span>No mainnet launch before audit, BLS vectors, liquidity tests, and legal approval.</span></li>
+          <li><ShieldCheck size={18} /><span>No keeper-provided entropy; the target future block is committed at purchase time.</span></li>
+          <li><ShieldCheck size={18} /><span>Reward tokens are reviewed before launch, pre-funded, and checked for exact transfers by the core.</span></li>
+          <li><ShieldCheck size={18} /><span>No unbacked inventory or jackpot liabilities.</span></li>
+          <li><ShieldCheck size={18} /><span>No mainnet sales before replacement deployment, lifecycle test, audit, and legal approval.</span></li>
         </ul>
       </section>
 

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import Image from "next/image";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import {
   ArrowUpRight,
   Check,
@@ -27,6 +28,8 @@ import {
   HOODPACKZ_V2_RECOVERY_AVAILABLE,
   claimHoodPackzJackpot,
   claimHoodPackzPrize,
+  cancelExpiredHoodPackzOpening,
+  finalizeHoodPackzOpening,
   formatOpeningAmount,
   readHoodPackzOpening,
   refundHoodPackzOpening,
@@ -38,15 +41,27 @@ import { HOODPACKZ_TOKENS, tokenExplorerUrl } from "@/lib/hoodpackz-tokens";
 import { HoodPackzBrand } from "@/components/brand/hoodpackz-brand";
 
 const TIERS = [
-  { name: "Corner", price: 5, label: "ENTRY" },
-  { name: "Block", price: 15, label: "CORE" },
-  { name: "City", price: 50, label: "HEAT" },
-] as const;
-
-const TOKEN_POOLS = [
-  [HOODPACKZ_TOKENS[0], HOODPACKZ_TOKENS[2], HOODPACKZ_TOKENS[4]],
-  [HOODPACKZ_TOKENS[1], HOODPACKZ_TOKENS[3], HOODPACKZ_TOKENS[5]],
-  [HOODPACKZ_TOKENS[6], HOODPACKZ_TOKENS[0], HOODPACKZ_TOKENS[3]],
+  {
+    name: "Corner",
+    price: 5,
+    label: "ENTRY",
+    image: "/corner-pack.png",
+    note: "The first pull. Three unique token rewards from the full seven-asset pool.",
+  },
+  {
+    name: "Block",
+    price: 15,
+    label: "CORE",
+    image: "/block-pack.png",
+    note: "The standard drop with larger token allocations and the same sealed draw.",
+  },
+  {
+    name: "City",
+    price: 50,
+    label: "HEAT",
+    image: "/city-pack.png",
+    note: "The top tier. Maximum configured rewards when City inventory is fully backed.",
+  },
 ] as const;
 
 function shortAddress(address: string) {
@@ -108,7 +123,13 @@ function HoodWalletButton() {
 
     return (
       <div className="hp-wallet-menu">
-        <button type="button" className="hp-wallet" onClick={() => setOpen((value) => !value)}>
+        <button
+          type="button"
+          className="hp-wallet"
+          aria-expanded={open}
+          aria-haspopup="menu"
+          onClick={() => setOpen((value) => !value)}
+        >
           <span className="hp-online-dot" />
           {shortAddress(address)}
           <ChevronDown size={14} />
@@ -117,6 +138,7 @@ function HoodWalletButton() {
           <button
             type="button"
             className="hp-disconnect"
+            role="menuitem"
             onClick={() => {
               setOpen(false);
               disconnect();
@@ -147,7 +169,6 @@ export default function HoodPackzPage() {
   const { connect, connectors, isPending: connecting } = useConnect();
   const { switchChain, isPending: switching } = useSwitchChain();
   const [tierIndex, setTierIndex] = useState(1);
-  const [poolIndex, setPoolIndex] = useState(1);
   const [openingState, setOpeningState] = useState<"idle" | "approving" | "submitting">("idle");
   const [claiming, setClaiming] = useState<string | null>(null);
   const [openingError, setOpeningError] = useState<string | null>(null);
@@ -155,10 +176,12 @@ export default function HoodPackzPage() {
   const [trackedOpeningIds, setTrackedOpeningIds] = useState<bigint[]>([]);
   const [trackedOpeningId, setTrackedOpeningId] = useState<bigint | null>(null);
   const [opening, setOpening] = useState<HoodPackzOpening | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const heroPackY = useTransform(scrollYProgress, [0, 0.22], [0, prefersReducedMotion ? 0 : -72]);
   const walletContext = useRef<{ address?: string; chainId?: number }>({});
   const openingContext = useRef<bigint | null>(null);
   const tier = TIERS[tierIndex];
-  const tokens = TOKEN_POOLS[poolIndex];
   const isLive = Boolean(HOODPACKZ_V2_ADDRESS) && HOODPACKZ_PACK_SALES_LIVE;
   const canRecover = HOODPACKZ_V2_RECOVERY_AVAILABLE;
 
@@ -209,8 +232,17 @@ export default function HoodPackzPage() {
     };
   }, [address, canRecover, trackedOpeningId]);
 
-  function reshufflePreview() {
-    setPoolIndex((current) => (current + 1) % TOKEN_POOLS.length);
+  function selectTier(index: number) {
+    setTierIndex(index);
+  }
+
+  function selectTierByKey(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const direction = event.key === "ArrowRight" ? 1 : -1;
+    const next = (index + direction + TIERS.length) % TIERS.length;
+    selectTier(next);
+    document.getElementById(`pack-tier-${next}`)?.focus();
   }
 
   async function openSelectedPack() {
@@ -320,23 +352,28 @@ export default function HoodPackzPage() {
           <a href="#assets">TOKENS</a>
           <a href="#proof">PROOF</a>
           <a href="#economics">ECONOMICS</a>
-          <a href="#transparency">CONTRACTS</a>
+          <a href="https://x.com/hoodpackz" target="_blank" rel="noreferrer">X / HOODPACKZ</a>
         </nav>
         <HoodWalletButton />
       </header>
 
       <section id="packs" className="hp-workbench" aria-labelledby="pack-heading">
-        <div className="hp-intro">
+        <motion.div
+          className="hp-intro"
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
           <div className="hp-kicker">
             <span>PACK OPENING DESK / RHC 4663</span>
             <span className={isLive ? "hp-live" : "hp-launching"}><i /> {isLive ? "LIVE" : "SALES PAUSED"}</span>
           </div>
           <h1 id="pack-heading">
-            THREE TOKENS.<br />ONE <span>SEALED DRAW.</span>
+            PACK THE<br />WHOLE <span>CHAIN.</span>
           </h1>
           <p>
-            At launch, each USDG tier will draw three different assets from funded onchain
-            inventory. No duplicates, no rerolls after the request is sealed.
+            Three distinct token rewards. One sealed onchain draw. Pick a tier, commit the future
+            block, and claim from inventory already reserved for the result.
           </p>
           <div className="hp-pool-strip" aria-label="Seven verified tokens in the pool">
             {HOODPACKZ_TOKENS.map((token) => (
@@ -347,49 +384,53 @@ export default function HoodPackzPage() {
             <small>7 VERIFIED ASSETS</small>
           </div>
           <div className="hp-trust-row">
-            <span><ShieldCheck size={15} /> 4-OF-7 BEACON</span>
+            <span><ShieldCheck size={15} /> FUTURE-BLOCK DRAW</span>
             <span><Dices size={15} /> 3 UNIQUE OUTPUTS</span>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="hp-product-stage" aria-label={`${tier.name} pack preview`}>
-          <div className={`hp-drop-ticket hp-drop-ticket-${tierIndex}`}>
-            <div className="hp-ticket-head">
-              <span>HOODPACKZ / DROP 001</span>
-              <span className={isLive ? "hp-ticket-live" : "hp-ticket-lock"}>
-                {isLive ? <Radio size={12} /> : <LockKeyhole size={12} />}
-                {isLive ? "LIVE" : "PAUSED"}
+        <motion.div
+          className="hp-pack-gallery"
+          style={{ y: heroPackY }}
+          initial={prefersReducedMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.9, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+          role="radiogroup"
+          aria-label="Choose a HoodPackz tier"
+        >
+          {TIERS.map((option, index) => (
+            <motion.button
+              id={`pack-tier-${index}`}
+              key={option.name}
+              type="button"
+              role="radio"
+              aria-checked={tierIndex === index}
+              tabIndex={tierIndex === index ? 0 : -1}
+              className={`hp-pack-card ${tierIndex === index ? "active" : ""}`}
+              onClick={() => selectTier(index)}
+              onKeyDown={(event) => selectTierByKey(event, index)}
+              whileHover={prefersReducedMotion ? undefined : { y: -12 }}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.985 }}
+              transition={{ type: "spring", stiffness: 240, damping: 24 }}
+            >
+              <span className="hp-pack-card-index">0{index + 1} / {option.label}</span>
+              <span className="hp-pack-card-art">
+                <Image
+                  src={option.image}
+                  alt={`${option.name} HoodPackz pack`}
+                  width={1024}
+                  height={1536}
+                  priority={index === 1}
+                  sizes="(max-width: 760px) 78vw, (max-width: 1100px) 32vw, 27vw"
+                />
               </span>
-            </div>
-            <div className="hp-ticket-price">
-              <span>{tier.name} pack</span>
-              <strong>${tier.price}<small> USDG</small></strong>
-            </div>
-            <div className="hp-ticket-rule">
-              <span>OUTPUT</span>
-              <strong>3 TOKENS / NO DUPES</strong>
-            </div>
-            <div className="hp-ticket-pulls" aria-label="Three token preview">
-              {tokens.map((token, index) => (
-                <div key={token.ticker} className="hp-ticket-token">
-                  <span>0{index + 1}</span>
-                  <Image src={token.logo} alt={`${token.name} logo`} width={64} height={64} />
-                  <div>
-                    <strong>{token.ticker}</strong>
-                    <small>{token.name}</small>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="hp-ticket-foot">
-              <span>PREVIEW SELECTION</span>
-              <span>FINAL DRAW: BEACON</span>
-            </div>
-          </div>
-          <button type="button" className="hp-shuffle" onClick={reshufflePreview}>
-            <RefreshCw size={14} /> SHUFFLE PREVIEW
-          </button>
-        </div>
+              <span className="hp-pack-card-meta">
+                <span><strong>{option.name}</strong><small>{option.note}</small></span>
+                <b>${option.price}<small> USDG</small></b>
+              </span>
+            </motion.button>
+          ))}
+        </motion.div>
 
         <div className="hp-control-panel">
           <div className="hp-panel-head">
@@ -407,11 +448,10 @@ export default function HoodPackzPage() {
                 type="button"
                 role="radio"
                 aria-checked={tierIndex === index}
+                tabIndex={tierIndex === index ? 0 : -1}
                 className={tierIndex === index ? "active" : ""}
-                onClick={() => {
-                  setTierIndex(index);
-                  setPoolIndex(index);
-                }}
+                onClick={() => selectTier(index)}
+                onKeyDown={(event) => selectTierByKey(event, index)}
               >
                 <span>{option.label}</span>
                 <strong>${option.price}</strong>
@@ -462,7 +502,7 @@ export default function HoodPackzPage() {
             {isLive ? <Zap size={17} /> : <LockKeyhole size={17} />}
             {actionLabel}
           </button>
-          <p className="hp-action-note">
+          <p className="hp-action-note" aria-live="polite">
             {submission ? (
               <>
                 OPENING #{submission.openingId.toString()} QUEUED.{" "}
@@ -477,9 +517,9 @@ export default function HoodPackzPage() {
             ) : openingError ? (
               <span className="hp-action-error">{openingError}</span>
             ) : isLive ? (
-              "Payment is submitted from your wallet. Three funded token rewards settle after the beacon finalizes."
+              "Payment is submitted from your wallet. Three funded rewards settle from a future Robinhood block hash."
             ) : (
-              "ONCHAIN SALES ARE PAUSED WHILE INVENTORY AND BEACON CAPACITY ARE ACTIVATED."
+              "ONCHAIN SALES ARE PAUSED WHILE THE SIMPLIFIED BETA CORE AND INVENTORY ARE ACTIVATED."
             )}
           </p>
 
@@ -489,6 +529,7 @@ export default function HoodPackzPage() {
                 <select
                   aria-label="Tracked opening"
                   value={trackedOpeningId.toString()}
+                  disabled={claiming !== null}
                   onChange={(event) => {
                     const nextOpeningId = BigInt(event.target.value);
                     setOpening(null);
@@ -509,7 +550,25 @@ export default function HoodPackzPage() {
               {!opening || opening.status === 0 ? (
                 <div className="hp-opening-pending">
                   <Radio size={15} />
-                  <span>{opening?.roundStatus === 3 ? "ROUND CANCELLED" : "WAITING FOR BEACON"}</span>
+                  <span>{opening?.roundStatus === 3 ? "DRAW CANCELLED" : opening?.targetBlock ? `WAITING FOR BLOCK ${opening.targetBlock}` : "WAITING FOR RANDOMNESS"}</span>
+                  {opening?.canFinalize && !opening.canCancel && address && (
+                    <button
+                      type="button"
+                      disabled={claiming !== null}
+                      onClick={() => runOpeningAction("finalize", () => finalizeHoodPackzOpening(opening.openingId, address))}
+                    >
+                      FINALIZE DRAW
+                    </button>
+                  )}
+                  {opening?.canCancel && address && (
+                    <button
+                      type="button"
+                      disabled={claiming !== null}
+                      onClick={() => runOpeningAction("cancel", () => cancelExpiredHoodPackzOpening(opening.openingId, address))}
+                    >
+                      REFUND EXPIRED DRAW
+                    </button>
+                  )}
                   {opening?.roundStatus === 3 && address && (
                     <button
                       type="button"
@@ -576,8 +635,8 @@ export default function HoodPackzPage() {
       </section>
 
       <section className="hp-status-rail" aria-label="Protocol status">
-        <div><Radio size={16} /><span>BEACON</span><strong>4 / 7 THRESHOLD</strong></div>
-        <div><ShieldCheck size={16} /><span>COLLATERAL</span><strong>EXPOSURE CAPPED</strong></div>
+        <div><Radio size={16} /><span>RANDOMNESS</span><strong>FUTURE BLOCK</strong></div>
+        <div><ShieldCheck size={16} /><span>INVENTORY</span><strong>PRE-FUNDED</strong></div>
         <div><Zap size={16} /><span>SETTLEMENT</span><strong>ROBINHOOD CHAIN</strong></div>
         <div className={isLive ? "" : "hp-status-warning"}>
           {isLive ? <Check size={16} /> : <TriangleAlert size={16} />}
@@ -663,18 +722,18 @@ export default function HoodPackzPage() {
       <section id="proof" className="hp-proof" aria-labelledby="proof-heading">
         <div className="hp-proof-head">
           <div>
-            <span className="hp-section-label">RANDOMNESS, WITH CONSEQUENCES</span>
-            <h2 id="proof-heading">THE BEACON CAN BE VERIFIED.<br />THE OPERATORS CAN BE SLASHED.</h2>
+            <span className="hp-section-label">SIMPLE BETA RANDOMNESS</span>
+            <h2 id="proof-heading">THE BLOCK IS CHOSEN FIRST.<br />THE HASH DETERMINES THE DRAW.</h2>
           </div>
           <a href="https://github.com/Jaredweb3here/hoodpackz" target="_blank" rel="noreferrer">
             VIEW SOURCE <ArrowUpRight size={16} />
           </a>
         </div>
         <div className="hp-proof-grid">
-          <article><span>01</span><Radio /><h3>REQUEST</h3><p>The pack locks its value before a randomness round is sealed.</p></article>
-          <article><span>02</span><ShieldCheck /><h3>SIGN</h3><p>Four independent operators produce threshold BLS shares against bonded collateral.</p></article>
-          <article><span>03</span><Dices /><h3>FINALIZE</h3><p>One unique aggregate signature becomes immutable randomness for the pull.</p></article>
-          <article><span>04</span><Zap /><h3>DELIVER</h3><p>Randomness finalizes independently, even if delivery needs to be retried.</p></article>
+          <article><span>01</span><Radio /><h3>REQUEST</h3><p>The purchase fixes a future Robinhood block before its hash exists.</p></article>
+          <article><span>02</span><ShieldCheck /><h3>WAIT</h3><p>Funds and all seven possible rewards remain reserved while the block is produced.</p></article>
+          <article><span>03</span><Dices /><h3>FINALIZE</h3><p>Anyone can use the fixed block hash to calculate the same four random words.</p></article>
+          <article><span>04</span><Zap /><h3>BETA LIMIT</h3><p>This is not VRF. Robinhood validators or block producers may influence block production.</p></article>
         </div>
       </section>
 
@@ -682,7 +741,7 @@ export default function HoodPackzPage() {
         <div className="hp-proof-head">
           <div>
             <span className="hp-section-label">FULLY ONCHAIN / ROBINHOOD CHAIN 4663</span>
-            <h2 id="transparency-heading">EVERY CONTRACT.<br />EVERY ADDRESS.</h2>
+            <h2 id="transparency-heading">DEPLOYED HISTORY.<br />VERIFIABLE ADDRESSES.</h2>
           </div>
           <a href="https://github.com/Jaredweb3here/hoodpackz" target="_blank" rel="noreferrer">
             VIEW SOURCE <ArrowUpRight size={16} />
@@ -690,11 +749,8 @@ export default function HoodPackzPage() {
         </div>
         <div className="hp-contract-grid">
           {([
-            { label: "HoodPackzCore V2", addr: "0x5337Ad84857E433b7d57Ca1130079044Ef37e436", note: "Pack sales, inventory, prize delivery" },
-            { label: "ThresholdRandomBeacon", addr: "0x2B4547eAf629dE637C28146C3104e83f1F0AE7dc", note: "4-of-7 BLS randomness finalization" },
-            { label: "BLS12381Verifier", addr: "0xf500CBd6bE6CCa621a0Bca39e384729E51ECF1c8", note: "EIP-2537 aggregate signature verification" },
-            { label: "BeaconOperatorRegistry", addr: "0xFbE3C11728676604f90ea637450B6FEd24af3bb0", note: "Operator registration and epoch keys" },
-            { label: "OperatorBondVault", addr: "0x70AFe9e397E0daF274368C6DEbd485F01B7c7E8D", note: "Slashable operator collateral" },
+            { label: "Legacy HoodPackzCore V2", addr: "0x5337Ad84857E433b7d57Ca1130079044Ef37e436", note: "Paused legacy deployment; not used for new sales" },
+            { label: "Archived ThresholdRandomBeacon", addr: "0x2B4547eAf629dE637C28146C3104e83f1F0AE7dc", note: "Experimental 4-of-7 path retained in source" },
           ] as const).map(({ label, addr, note }) => (
             <a
               key={addr}
@@ -713,11 +769,26 @@ export default function HoodPackzPage() {
       </section>
 
       <footer className="hp-footer">
-        <HoodPackzBrand />
-        <p>HOODPACKZ / ROBINHOOD CHAIN</p>
-        <div>
-          <a href="https://github.com/Jaredweb3here/hoodpackz" target="_blank" rel="noreferrer" aria-label="HoodPackz on GitHub"><Code2 size={18} /></a>
-          <a href="https://robinhoodchain.blockscout.com" target="_blank" rel="noreferrer" aria-label="Robinhood Chain explorer"><ExternalLink size={18} /></a>
+        <div className="hp-footer-top">
+          <div>
+            <span className="hp-section-label">THE DROP LIVES ONCHAIN</span>
+            <h2>PACK THE BLOCK.<br />CLAIM THE CITY.</h2>
+          </div>
+          <nav aria-label="Footer navigation">
+            <a href="#packs">Packs <ArrowUpRight size={18} /></a>
+            <a href="#assets">Token pool <ArrowUpRight size={18} /></a>
+            <a href="https://x.com/hoodpackz" target="_blank" rel="noreferrer">X / @hoodpackz <ArrowUpRight size={18} /></a>
+            <a href="https://github.com/Jaredweb3here/hoodpackz" target="_blank" rel="noreferrer">Source <Code2 size={18} /></a>
+          </nav>
+        </div>
+        <div className="hp-footer-word" aria-hidden="true">HOODPACKZ</div>
+        <div className="hp-footer-base">
+          <HoodPackzBrand />
+          <p>ROBINHOOD CHAIN / 4663 / BETA</p>
+          <div>
+            <a href="https://x.com/hoodpackz" target="_blank" rel="noreferrer" aria-label="HoodPackz on X">X</a>
+            <a href="https://robinhoodchain.blockscout.com" target="_blank" rel="noreferrer" aria-label="Robinhood Chain explorer"><ExternalLink size={18} /></a>
+          </div>
         </div>
       </footer>
     </main>
