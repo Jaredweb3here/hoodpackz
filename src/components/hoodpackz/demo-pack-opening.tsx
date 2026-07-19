@@ -95,15 +95,15 @@ export function DemoPackOpening({ open, pack, onClose }: DemoPackOpeningProps) {
     if (prefersReducedMotion) return () => window.clearTimeout(resetTimer);
 
     const timers = [
-      window.setTimeout(() => setPhase("tearing"), 950),
-      window.setTimeout(() => setPhase("shuffling"), 2100),
+      window.setTimeout(() => setPhase("tearing"), 850),
+      window.setTimeout(() => setPhase("shuffling"), 2300),
       window.setTimeout(() => {
         setPhase("revealing");
         setRevealed(1);
-      }, 4200),
-      window.setTimeout(() => setRevealed(2), 5100),
-      window.setTimeout(() => setRevealed(3), 6000),
-      window.setTimeout(() => setPhase("result"), 7100),
+      }, 4700),
+      window.setTimeout(() => setRevealed(2), 5750),
+      window.setTimeout(() => setRevealed(3), 6800),
+      window.setTimeout(() => setPhase("result"), 8050),
     ];
 
     return () => {
@@ -161,8 +161,8 @@ export function DemoPackOpening({ open, pack, onClose }: DemoPackOpeningProps) {
               <div className="hp-demo-phase-label" aria-live="polite">
                 <span>0{["sealed", "tearing", "shuffling", "revealing", "result"].indexOf(phase) + 1}</span>
                 {phase === "sealed" && "PACK SEALED"}
-                {phase === "tearing" && "OPENING SEAL"}
-                {phase === "shuffling" && "SLIDING 3 CARDS"}
+                {phase === "tearing" && "CRACKING SEAL"}
+                {phase === "shuffling" && "DEALING THE PULLS"}
                 {phase === "revealing" && `REVEALING ${revealed} / 3`}
                 {phase === "result" && "CHOOSE KEEP OR SELL"}
               </div>
@@ -175,18 +175,29 @@ export function DemoPackOpening({ open, pack, onClose }: DemoPackOpeningProps) {
                     initial={{ opacity: 0, scale: 0.84, rotate: -4 }}
                     animate={
                       phase === "tearing"
-                        ? { opacity: 1, scale: 1.08, rotate: [0, -1.4, 1.3, -0.8, 0.5, 0], x: [0, -5, 5, -3, 3, 0] }
+                        ? {
+                            opacity: 1,
+                            scale: [1, 1.1, 1.04, 1.13],
+                            rotate: [0, -2.6, 2.2, -1.4, 1, 0],
+                            x: [0, -8, 9, -6, 5, 0],
+                            filter: ["brightness(1)", "brightness(1.18)", "brightness(1.05)", "brightness(1.25)"],
+                          }
                         : { opacity: 1, scale: 1, rotate: 0, y: [0, -8, 0] }
                     }
                     exit={{ opacity: 0, scale: 1.12, filter: "blur(14px)" }}
                     transition={
                       phase === "tearing"
-                        ? { duration: 0.45, repeat: 1, ease: "easeInOut" }
+                        ? { duration: 0.62, repeat: 1, ease: "easeInOut" }
                         : { opacity: { duration: 0.5 }, scale: { duration: 0.7 }, y: { duration: 2.4, repeat: Infinity, ease: "easeInOut" } }
                     }
                   >
                     <Image src={pack.image} alt={`${pack.name} pack`} fill sizes="(max-width: 600px) 58vw, 300px" priority />
-                    {phase === "tearing" && <motion.i initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.55 }} />}
+                    {phase === "tearing" && (
+                      <>
+                        <motion.i initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.62 }} />
+                        <motion.em initial={{ scaleY: 0, opacity: 0 }} animate={{ scaleY: 1, opacity: [0, 1, 0.2] }} transition={{ duration: 0.85, delay: 0.25 }} />
+                      </>
+                    )}
                   </motion.div>
                 )}
 
@@ -194,9 +205,9 @@ export function DemoPackOpening({ open, pack, onClose }: DemoPackOpeningProps) {
                   <motion.div
                     key="cards"
                     className="hp-demo-cards"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    initial={{ opacity: 0, scale: 0.86, y: 46 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                   >
                     {tokens.map((token, index) => {
                       const isRevealed = phase === "result" || (phase === "revealing" && revealed > index);
@@ -206,16 +217,28 @@ export function DemoPackOpening({ open, pack, onClose }: DemoPackOpeningProps) {
                         <motion.article
                           key={`${run}-${token.address}`}
                           className={`${isRevealed ? "revealed" : ""} ${legendary ? "legendary" : ""}`}
-                          initial={{ x: 0, y: 16, opacity: 0, rotate: 0 }}
+                          initial={{ x: 0, y: 42, opacity: 0, rotate: 0, scale: 0.82 }}
                           animate={
                             phase === "shuffling"
-                              ? { x: (index - 1) * 210, y: [0, -10, 0], opacity: 1, rotate: (index - 1) * 4 }
-                              : { x: 0, y: 0, opacity: 1, rotate: 0 }
+                              ? {
+                                  x: (index - 1) * 235,
+                                  y: [28, -34, 10, 0],
+                                  opacity: 1,
+                                  rotate: [(index - 1) * -10, (index - 1) * 8, (index - 1) * 4],
+                                  scale: [0.82, 1.08, 1],
+                                }
+                              : {
+                                  x: 0,
+                                  y: isRevealed ? [0, -18, 0] : 0,
+                                  opacity: 1,
+                                  rotate: 0,
+                                  scale: isRevealed ? [1, 1.08, 1] : 1,
+                                }
                           }
                           transition={
                             phase === "shuffling"
-                              ? { duration: 1.25, delay: index * 0.18, ease: [0.16, 1, 0.3, 1] }
-                              : { duration: 0.75, delay: index * 0.12, ease: [0.16, 1, 0.3, 1] }
+                              ? { duration: 1.65, delay: index * 0.2, ease: [0.16, 1, 0.3, 1] }
+                              : { duration: 0.85, delay: index * 0.12, ease: [0.16, 1, 0.3, 1] }
                           }
                         >
                           <div className="hp-demo-card-back">
@@ -246,7 +269,7 @@ export function DemoPackOpening({ open, pack, onClose }: DemoPackOpeningProps) {
 
               {phase === "tearing" && (
                 <div className="hp-demo-sparks" aria-hidden="true">
-                  {Array.from({ length: 14 }, (_, index) => (
+                  {Array.from({ length: 24 }, (_, index) => (
                     <motion.i
                       key={index}
                       initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
