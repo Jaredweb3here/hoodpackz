@@ -3558,6 +3558,38 @@ body {
 
 .hp-prize-value { color: #248f35 !important; }
 
+.hp-token-registry-row,
+.hp-token-identity strong,
+.hp-status-rail strong,
+.hp-assets-state,
+.hp-proof-grid h3,
+.hp-footer,
+.hp-footer a {
+  color: var(--hp-ink);
+}
+
+.hp-token-registry-row code,
+.hp-token-identity small,
+.hp-assets-state span,
+.hp-assets-state small,
+.hp-assets-note,
+.hp-status-rail span,
+.hp-proof-grid p,
+.hp-footer p,
+.hp-footer-base,
+.hp-footer-base a {
+  color: rgba(22, 36, 29, 0.64);
+}
+
+.hp-token-explorer,
+.hp-assets-state strong,
+.hp-proof-head > a,
+.hp-proof-note,
+.hp-footer a:hover,
+.hp-footer a:focus-visible {
+  color: #248f35;
+}
+
 .hp-pack-result-total,
 .hp-pack-result-actions {
   display: flex;
