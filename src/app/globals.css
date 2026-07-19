@@ -3590,6 +3590,45 @@ body {
   color: #248f35;
 }
 
+.hp-pack-card,
+.hp-pack-card-meta strong,
+.hp-pack-card-meta b,
+.hp-panel-head strong,
+.hp-tier-control button,
+.hp-tier-control strong,
+.hp-tier-control small {
+  color: var(--hp-ink);
+}
+
+.hp-pack-card-index,
+.hp-pack-card-meta small,
+.hp-panel-head div span,
+.hp-series,
+.hp-tier-control span {
+  color: rgba(22, 36, 29, 0.64);
+}
+
+.hp-control-panel {
+  border-color: var(--hp-line);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.hp-panel-head,
+.hp-pull-list,
+.hp-total {
+  border-color: var(--hp-line);
+}
+
+.hp-series {
+  border-color: rgba(22, 36, 29, 0.18);
+  background: #f4ffe5;
+}
+
+.hp-pack-card-meta b,
+.hp-tier-control button.active strong {
+  color: #248f35;
+}
+
 .hp-pack-result-total,
 .hp-pack-result-actions {
   display: flex;

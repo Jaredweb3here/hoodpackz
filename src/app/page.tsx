@@ -621,6 +621,7 @@ export default function HoodPackzPage() {
                       const value = token
                         ? tokenValueUsd(token.address, opening.amounts[index], token.decimals, livePrices)
                         : null;
+                      const source = token ? livePrices.get(token.address.toLowerCase())?.source : null;
                       return (
                         <div key={prizeAddress} className={claimed ? "claimed" : ""}>
                           {token && <Image src={token.logo} alt="" width={30} height={30} />}
@@ -628,7 +629,9 @@ export default function HoodPackzPage() {
                             <strong>{token?.ticker ?? shortAddress(prizeAddress)}</strong>
                             <small>{formatOpeningAmount(opening.amounts[index], token?.decimals ?? 18)}</small>
                             <small className="hp-prize-value">
-                              {value == null ? "NO LIVE QUOTE" : `${formatUsd(value)} RPC spot`}
+                              {value == null
+                                ? "NO LIVE QUOTE"
+                                : `${formatUsd(value)} ${source?.includes("RPC") ? "RPC spot" : "market"}`}
                             </small>
                           </span>
                           <button
