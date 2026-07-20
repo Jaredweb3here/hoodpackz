@@ -1,4 +1,4 @@
-# Paky
+# Paxz
 
 **Onchain token packs. Three funded rewards per pull. Simple beta settlement.**
 
@@ -13,7 +13,7 @@
 
 ---
 
-## What is Paky
+## What is Paxz
 
 You pay USDG. You get three real ERC-20 meme tokens from a seven-asset pool. The beta fixes a future Robinhood block when the purchase is created and derives the draw from that block hash. Anyone can finalize the draw after the block exists. Every possible prize is reserved before payment and every dollar follows a published split.
 

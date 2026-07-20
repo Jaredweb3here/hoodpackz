@@ -4,8 +4,8 @@ import { ArrowLeft, Check, Clock3, LockKeyhole, ShieldCheck } from "lucide-react
 import { HoodPackzBrand } from "@/components/brand/hoodpackz-brand";
 
 export const metadata: Metadata = {
-  title: "Protocol Status | Paky",
-  description: "Paky protocol notes, reserve model, economics, and deployment status.",
+  title: "Protocol Status | Paxz",
+  description: "Paxz protocol notes, reserve model, economics, and deployment status.",
 };
 
 const STATUS = [
@@ -32,7 +32,7 @@ export default function DocsPage() {
           <h1>LIVE PACKS.<br />PUBLIC RULES.</h1>
         </div>
         <p>
-          Paky uses a fixed future Robinhood block hash with permissionless reveal.
+          Paxz uses a fixed future Robinhood block hash with permissionless reveal.
           Only funded packs can open; locked packs stay closed until their reserves are ready.
         </p>
       </section>

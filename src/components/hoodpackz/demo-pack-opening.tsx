@@ -31,15 +31,7 @@ function CountUpValue({ value, active }: { value: number | null; active: boolean
   const [displayValue, setDisplayValue] = useState<number | null>(0);
 
   useEffect(() => {
-    if (!active) {
-      setDisplayValue(0);
-      return;
-    }
-
-    if (value == null) {
-      setDisplayValue(null);
-      return;
-    }
+    if (!active || value == null) return;
 
     const duration = 1250;
     const startedAt = performance.now();
@@ -56,7 +48,7 @@ function CountUpValue({ value, active }: { value: number | null; active: boolean
     return () => cancelAnimationFrame(frame);
   }, [active, value]);
 
-  return <>{formatDemoUsd(displayValue)}</>;
+  return <>{formatDemoUsd(!active ? 0 : value == null ? null : displayValue)}</>;
 }
 
 interface DemoPackOpeningProps {
@@ -266,7 +258,7 @@ export function DemoPackOpening({ open, pack, onClose }: DemoPackOpeningProps) {
                           }
                         >
                           <div className="hp-demo-card-back">
-                            <span>PKY</span>
+                            <span>PXZ</span>
                             <small>SEALED SLOT 0{index + 1}</small>
                           </div>
                           <div className="hp-demo-card-front" style={{ "--token-accent": token.color } as CSSProperties}>
@@ -274,7 +266,7 @@ export function DemoPackOpening({ open, pack, onClose }: DemoPackOpeningProps) {
                             {legendary && <span className="hp-demo-rarity">LEGENDARY / PSA 10</span>}
                             <span className="hp-demo-slab">
                               <strong>PSA</strong>
-                              <small>PACKY CERTIFIED<br />ONCHAIN PULL</small>
+                              <small>PAXZ CERTIFIED<br />ONCHAIN PULL</small>
                             </span>
                             <Image src={token.logo} alt="" width={112} height={112} />
                             <div>

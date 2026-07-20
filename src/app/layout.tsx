@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: "Paky | Onchain Token Packs",
+  title: "Paxz | Onchain Token Packs",
   description:
     "Open token packs from funded reserves on Robinhood Chain.",
   icons: {
@@ -23,12 +23,12 @@ export const metadata: Metadata = {
     apple: "/favicon.png",
   },
   openGraph: {
-    title: "Paky",
+    title: "Paxz",
     description: "Three-token packs from funded reserves on Robinhood Chain.",
   },
   twitter: {
     card: "summary",
-    title: "Paky",
+    title: "Paxz",
     description: "Three-token packs from funded reserves on Robinhood Chain.",
   },
 };

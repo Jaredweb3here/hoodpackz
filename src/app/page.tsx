@@ -378,6 +378,10 @@ export default function HoodPackzPage() {
 
   return (
     <main id="top" className="hp-shell">
+      <div className="hp-announcement">
+        <span>{isLive ? "Live beta on Robinhood Chain" : "Beta reserve activation in progress"}</span>
+        <a href="#proof">See how every draw settles <ArrowUpRight size={13} /></a>
+      </div>
       <header className="hp-header">
         <HoodPackzBrand href="#top" />
         <nav className="hp-nav" aria-label="Primary navigation">
@@ -385,7 +389,7 @@ export default function HoodPackzPage() {
           <a href="#assets">TOKENS</a>
           <a href="#proof">PROOF</a>
           <a href="#economics">ECONOMICS</a>
-          <a href="https://x.com/pakydotfun" target="_blank" rel="noreferrer">X / @PAKYDOTFUN</a>
+          <a href="/docs">STATUS</a>
         </nav>
         <HoodWalletButton />
       </header>
@@ -398,15 +402,15 @@ export default function HoodPackzPage() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="hp-kicker">
-            <span>LIVE PACK DESK / RHC 4663</span>
+            <span>ONCHAIN TOKEN PACKS / RHC 4663</span>
             <span className={isLive ? "hp-live" : "hp-launching"}><i /> {isLive ? "LIVE" : "PACKS PAUSED"}</span>
           </div>
           <h1 id="pack-heading">
-            OPEN PACK.<br /><span>KEEP OR SELL.</span>
+            OPEN THE MARKET.<br /><span>ONE PACK AT A TIME.</span>
           </h1>
           <p>
-            Open a pack, watch three cards slide out slowly, reveal each token, then choose whether
-            to claim the tokens or sell the pack back from the frontend flow.
+            Choose a tier and reveal three different Robinhood Chain tokens from a funded reserve.
+            Every draw is fixed onchain before the result exists.
           </p>
           <div className="hp-pool-strip" aria-label="Seven verified tokens in the pool">
             {HOODPACKZ_TOKENS.map((token) => (
@@ -430,7 +434,7 @@ export default function HoodPackzPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.9, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
           role="radiogroup"
-          aria-label="Choose a Paky pack"
+          aria-label="Choose a Paxz pack"
         >
           {TIERS.map((option, index) => (
             <motion.button
@@ -451,7 +455,7 @@ export default function HoodPackzPage() {
               <span className="hp-pack-card-art">
                 <Image
                   src={option.image}
-                  alt={`${option.name} Paky pack`}
+                  alt={`${option.name} Paxz pack`}
                   width={1024}
                   height={1536}
                   priority={index === 1}
@@ -724,7 +728,7 @@ export default function HoodPackzPage() {
         <div className="hp-assets-head">
           <div>
             <span className="hp-section-label">ROBINHOOD CHAIN / ERC-20 REWARDS</span>
-            <h2 id="assets-heading">SEVEN TOKENS.<br />ONE DRAW.</h2>
+            <h2 id="assets-heading">THE POOL,<br />ONCHAIN.</h2>
           </div>
           <div className="hp-assets-state">
             <span>CONTRACTS</span>
@@ -844,20 +848,20 @@ export default function HoodPackzPage() {
         <div className="hp-footer-top">
           <div>
             <span className="hp-section-label">LIVE ON ROBINHOOD CHAIN</span>
-            <h2>OPEN THE PACK.<br />CLAIM OR SELL.</h2>
+            <h2>THREE TOKENS.<br />ONE OPENING.</h2>
           </div>
           <nav aria-label="Footer navigation">
             <a href="#packs">Packs <ArrowUpRight size={18} /></a>
             <a href="#assets">Reward pool <ArrowUpRight size={18} /></a>
-            <a href="https://x.com/pakydotfun" target="_blank" rel="noreferrer">X / @pakydotfun <ArrowUpRight size={18} /></a>
+            <a href="https://x.com/pakydotfun" target="_blank" rel="noreferrer">Community on X <ArrowUpRight size={18} /></a>
           </nav>
         </div>
-        <div className="hp-footer-word" aria-hidden="true">PAKY</div>
+        <div className="hp-footer-word" aria-hidden="true">PAXZ</div>
         <div className="hp-footer-base">
           <p />
           <p>ROBINHOOD CHAIN / 4663 / BETA</p>
           <div>
-            <a href="https://x.com/pakydotfun" target="_blank" rel="noreferrer" aria-label="Paky on X">X</a>
+            <a href="https://x.com/pakydotfun" target="_blank" rel="noreferrer" aria-label="Paxz on X">X</a>
             <a href="https://robinhoodchain.blockscout.com" target="_blank" rel="noreferrer" aria-label="Robinhood Chain explorer"><ExternalLink size={18} /></a>
           </div>
         </div>
