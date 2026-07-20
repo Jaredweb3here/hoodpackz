@@ -853,7 +853,7 @@ export default function HoodPackzPage() {
           <nav aria-label="Footer navigation">
             <a href="#packs">Packs <ArrowUpRight size={18} /></a>
             <a href="#assets">Reward pool <ArrowUpRight size={18} /></a>
-            <a href="https://x.com/pakydotfun" target="_blank" rel="noreferrer">Community on X <ArrowUpRight size={18} /></a>
+            <a href="https://x.com/paxzdotfun" target="_blank" rel="noreferrer">Community on X <ArrowUpRight size={18} /></a>
           </nav>
         </div>
         <div className="hp-footer-word" aria-hidden="true">PAXZ.FUN</div>
@@ -861,7 +861,7 @@ export default function HoodPackzPage() {
           <p />
           <p>ROBINHOOD CHAIN / 4663 / BETA</p>
           <div>
-            <a href="https://x.com/pakydotfun" target="_blank" rel="noreferrer" aria-label="Paxz on X">X</a>
+            <a href="https://x.com/paxzdotfun" target="_blank" rel="noreferrer" aria-label="Paxz on X">X</a>
             <a href="https://robinhoodchain.blockscout.com" target="_blank" rel="noreferrer" aria-label="Robinhood Chain explorer"><ExternalLink size={18} /></a>
           </div>
         </div>

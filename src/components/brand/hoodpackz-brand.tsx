@@ -10,7 +10,7 @@ export function HoodPackzBrand({ href = "/", compact = false }: HoodPackzBrandPr
   return (
     <Link href={href} className="hp-brand" aria-label="Paxz home">
       <span className="hp-brand-mark" aria-hidden="true">
-        <Image src="/pakz-logo.png" alt="" width={38} height={38} priority />
+        <Image src="/lopa.png" alt="" width={38} height={38} priority />
       </span>
       {!compact && <span>PAXZ</span>}
     </Link>

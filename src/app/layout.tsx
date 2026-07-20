@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   description:
     "Open token packs from funded reserves on Robinhood Chain.",
   icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
+    icon: "/lopa.png",
+    apple: "/lopa.png",
   },
   openGraph: {
     title: "Paxz",

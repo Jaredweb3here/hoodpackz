@@ -9,7 +9,7 @@
 
 **CA:** [`0x558530c1e1c58e0a90e98ea735d0f4f0147f7777`](https://robinhoodchain.blockscout.com/address/0x558530c1e1c58e0a90e98ea735d0f4f0147f7777)
 
-**X:** [@pakydotfun](https://x.com/pakydotfun)
+**X:** [@paxzdotfun](https://x.com/paxzdotfun)
 
 ---
 
